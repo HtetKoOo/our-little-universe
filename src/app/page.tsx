@@ -7,7 +7,7 @@ export default function Welcome() {
         <Heart size={32} className="accent" />
         <p className="eyebrow">JUST THE TWO OF US</p>
         <h1>
-          Our sweet
+          Our little
           <br />
           <em>universe.</em>
         </h1>

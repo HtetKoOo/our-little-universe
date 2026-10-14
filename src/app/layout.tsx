@@ -8,8 +8,8 @@ export const viewport: Viewport = {
 };
 export const metadata: Metadata = {
   title: {
-    default: "Our Sweet Universe",
-    template: "%s · Our Sweet Universe",
+    default: "Our Little Universe",
+    template: "%s · Our Little Universe",
   },
   description: "A private place for our story.",
   robots: { index: false, follow: false },
