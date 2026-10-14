@@ -14,7 +14,7 @@ export function authConfigured() {
 }
 function createAuth() {
   return betterAuth({
-    appName: "Our Sweet Universe",
+    appName: "Our Little Universe",
     baseURL: process.env.BETTER_AUTH_URL!,
     secret: process.env.BETTER_AUTH_SECRET!,
     database: drizzleAdapter(getDb(), { provider: "pg", schema }),

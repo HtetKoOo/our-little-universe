@@ -84,7 +84,7 @@ export function CoupleMainCard({
       {controls}
       <div className={styles["couple-card-top"]}>
         <Heart size={13} aria-hidden="true" />
-        <span>OUR SWEET UNIVERSE</span>
+        <span>OUR LITTLE UNIVERSE</span>
         <Heart size={13} aria-hidden="true" />
       </div>
       <div className={styles["couple-heart-scene"]}>

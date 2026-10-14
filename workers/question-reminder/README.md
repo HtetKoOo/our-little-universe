@@ -1,4 +1,4 @@
-# Our Sweet Universe email Worker
+# Our Little Universe email Worker
 
 This tiny Cloudflare Worker wakes the app twice a day. It contains neither
 Database nor Resend credentials; it only carries a shared secret used to call

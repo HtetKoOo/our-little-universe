@@ -46,7 +46,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <Link href="/" className="brand">
           <Heart size={23} />
           <span>
-            our sweet
+            our little
             <br />
             <strong>universe</strong>
             <i>EST. IN LOVE</i>
