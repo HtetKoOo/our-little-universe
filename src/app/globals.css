@@ -2818,44 +2818,68 @@ body:has(.memory-detail) .private-header {
   margin-top: 20px;
 }
 .gallery-viewer {
+  box-sizing: border-box;
   width: min(900px, calc(100vw - 28px));
+  height: min(820px, calc(100dvh - 28px));
   max-height: calc(100dvh - 28px);
   margin: auto;
   padding: 0;
-  overflow: hidden;
+  overflow: auto;
   border: 0;
   border-radius: 24px;
   background: #1e1820;
   color: #fff;
   box-shadow: 0 20px 70px #0008;
 }
+.gallery-viewer[open] {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
 .gallery-viewer::backdrop {
   background: #2c1625aa;
   backdrop-filter: blur(5px);
 }
-.gallery-viewer img {
+.gallery-viewer-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px 12px;
+}
+.gallery-viewer-image {
+  position: relative;
+  min-height: 0;
+  min-width: 0;
+}
+.gallery-viewer-image img {
+  position: absolute;
+  inset: 0;
   display: block;
-  width: auto;
-  max-width: 100%;
-  max-height: calc(100dvh - 94px);
-  margin: auto;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
 }
-.gallery-viewer p {
+.gallery-viewer-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px 18px;
+  padding: 12px 16px max(16px, env(safe-area-inset-bottom));
+}
+.gallery-viewer-footer p {
   margin: 0;
-  padding: 13px 20px 17px;
   color: #f6dbe6;
-  text-align: center;
   font-size: 0.82rem;
 }
+.gallery-viewer-footer .button {
+  margin: 0;
+  max-width: 100%;
+  min-height: 44px;
+}
 .gallery-viewer-close {
-  position: absolute;
-  z-index: 1;
-  top: 12px;
-  right: 12px;
   display: grid;
-  width: 42px;
-  height: 42px;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
   place-items: center;
   border: 1px solid #ffffff4d;
   border-radius: 50%;
@@ -3841,6 +3865,7 @@ body:has(.memory-detail) .private-header {
 .media-library-dialog {
   width: min(680px, calc(100vw - 24px));
   max-height: min(760px, calc(100dvh - 24px));
+  box-sizing: border-box;
   padding: 0;
   overflow: hidden;
   border: 1px solid #edcfdb;
@@ -3848,6 +3873,30 @@ body:has(.memory-detail) .private-header {
   background: #fff9fc;
   color: #452d3b;
   box-shadow: 0 24px 80px #452d3b55;
+}
+/* Keep actions visible; only the middle content scrolls within the dialog. */
+.media-library-dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+.media-library-head,
+.media-picker-footer {
+  flex-shrink: 0;
+}
+.media-library-body {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+.media-library-body .media-library-grid {
+  max-height: none;
+  min-height: 0;
+  overflow: visible;
+}
+.media-library-body > .form-status,
+.media-library-body > .media-batch-status {
+  margin-inline: 22px;
 }
 .media-library-dialog::backdrop {
   background: #452d3b8c;
