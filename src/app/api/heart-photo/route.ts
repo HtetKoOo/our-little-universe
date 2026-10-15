@@ -89,7 +89,6 @@ async function mutate(request: Request) {
       actor,
       revision,
       photos,
-      request.method === "POST" ? photos.at(-1)?.id : undefined,
     );
     if (!saved)
       return reply(

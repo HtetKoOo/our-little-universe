@@ -7,7 +7,7 @@ import { saveHomeWidgets } from "@/app/space/customize/actions";
 import type { HomeWidgetConfig, HomeWidgetId } from "@/lib/home-widgets";
 
 const copy: Record<HomeWidgetId, { title: string; description: string }> = {
-  photo: { title: "Our photos", description: "A shortcut to the heart photo on your main card." },
+  photo: { title: "Our photos", description: "Your shared gallery photos, ready to revisit." },
   jar: { title: "Memory jar", description: "A small thought to save or open later." },
   question: { title: "One Little Question", description: "Your shared daily check-in." },
   memory: { title: "Latest memory", description: "A recent or favorite moment from your story." },

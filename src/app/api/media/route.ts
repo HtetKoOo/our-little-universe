@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     }
     const actor = await requireCouple();
     const asset = await uploadMemoryImage(actor, bytes);
-    return Response.json({ asset: { id: asset.id, format: asset.format, width: asset.width, height: asset.height } }, { status: 201, headers });
+    return Response.json({ duplicate: asset.duplicate, asset: { id: asset.id, format: asset.format, width: asset.width, height: asset.height } }, { status: asset.duplicate ? 200 : 201, headers });
   } catch (error) {
     const message = error instanceof Error ? error.message : "upload-failed";
     const status = message === "upload-rate-limit" ? 429 : message === "too-large" ? 413 : 500;

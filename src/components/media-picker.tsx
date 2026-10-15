@@ -1,6 +1,7 @@
 "use client";
 /* eslint-disable @next/next/no-img-element -- this endpoint needs the browser session cookie. */
 
+import { uploadSharedPhoto } from "@/lib/media-upload-client";
 import { useRef, useState } from "react";
 import { Check, ImagePlus, LoaderCircle, X } from "lucide-react";
 
@@ -29,12 +30,11 @@ export function MediaPicker({ assets: initialAssets, selectedIds = [] }: { asset
     }
     setPending(true); setMessage("");
     try {
-      const response = await fetch("/api/media", { method: "POST", body: file, headers: { "Content-Type": file.type }, signal: AbortSignal.timeout(75000) });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.message ?? "Couldn’t add this photo.");
-      const asset = result.asset as LibraryAsset;
-      setAssets((current) => [asset, ...current]);
-      setSelected((current) => current.length < 12 ? [...current, asset.id] : current);
+      const result = await uploadSharedPhoto(file);
+      const asset = result.asset;
+      setAssets((current) => current.some(item => item.id === asset.id) ? current : [asset, ...current]);
+      setSelected((current) => current.includes(asset.id) || current.length >= 12 ? current : [...current, asset.id]);
+      if (result.duplicate) setMessage("This photo is already in your Gallery. Using the existing photo.");
     } catch (error) { setMessage(error instanceof Error ? error.message : "Couldn’t add this photo."); }
     finally { setPending(false); }
   }

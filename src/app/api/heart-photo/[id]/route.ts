@@ -1,3 +1,4 @@
+import { findMediaAsset } from "@/lib/media";
 import { z } from "zod";
 import { photoActor, publicIdFor } from "@/lib/heart-photo";
 import { getCloudinary } from "@/lib/cloudinary";
@@ -21,8 +22,9 @@ export async function GET(
     const actor = await photoActor(request.headers);
     const photo = actor?.photos.find((item) => item.id === id);
     if (!actor || !photo) return new Response(null, { status: 404, headers });
+    const asset = await findMediaAsset(actor, id);
     const url = getCloudinary().utils.private_download_url(
-      publicIdFor(id),
+      asset?.publicId ?? publicIdFor(id),
       photo.format,
       {
         resource_type: "image",
