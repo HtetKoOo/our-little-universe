@@ -79,6 +79,7 @@ export function MediaPicker({ assets: initialAssets, selectedIds = [], onUploadi
         <div><p className="eyebrow">OUR GALLERY</p><h2 id="media-library-title">Add photos</h2></div>
         <button type="button" className="media-dialog-close" disabled={pending} onClick={() => dialog.current?.close()} aria-label="Close photo picker"><X size={22} aria-hidden="true" /></button>
       </div>
+      <div className="media-library-body">
       <p className="media-library-copy">Upload up to 10 photos at a time. Keep up to 100 in this memory, or choose from Gallery.</p>
       <button className="media-upload" type="button" disabled={pending || selected.length >= MAX_MEMORY_MEDIA} onClick={() => input.current?.click()}>
         {pending ? <LoaderCircle className="media-spin" size={19} aria-hidden="true" /> : <ImagePlus size={19} aria-hidden="true" />}
@@ -96,6 +97,7 @@ export function MediaPicker({ assets: initialAssets, selectedIds = [], onUploadi
           </button>;
         })}
       </div> : <p className="media-empty">Your shared photo shelf is waiting for its first photo.</p>}
+      </div>
       <div className="media-picker-footer">
         <span>{selected.length ? `${selected.length} / 100 selected` : "Select up to 100 photos"}</span>
         <button className="button" type="button" disabled={pending} onClick={() => dialog.current?.close()}>{selected.length ? `Add (${selected.length})` : "Done"}</button>

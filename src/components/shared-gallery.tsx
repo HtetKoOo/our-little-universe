@@ -1,7 +1,8 @@
 "use client";
 /* eslint-disable @next/next/no-img-element -- authenticated photos use the app's private media route. */
 
-import { uploadSharedPhoto } from "@/lib/media-upload-client";
+import { uploadPhotoBatch, type FailedPhotoUpload, type UploadProgress } from "@/lib/media-upload-queue";
+import { MAX_MEMORY_UPLOAD_BATCH, MAX_MEMORY_IMAGE_BYTES } from "@/lib/media-input";
 import { useRef, useState } from "react";
 import { ImagePlus, LoaderCircle, X } from "lucide-react";
 
@@ -14,25 +15,42 @@ export function SharedGallery({ initialAssets, uploadsEnabled }: { initialAssets
   const [active, setActive] = useState<GalleryAsset | null>(null);
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState("");
-  async function upload(file: File | undefined) {
-    if (!file || pending) return;
-    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 8 * 1024 * 1024) {
-      setMessage("Choose a JPG, PNG or WebP photo under 8 MB.");
+  const [failures, setFailures] = useState<FailedPhotoUpload[]>([]);
+  const [progress, setProgress] = useState<UploadProgress | null>(null);
+  const uploading = useRef(false);
+  async function upload(files: File[]) {
+    if (!files.length || uploading.current) return;
+    if (files.length > MAX_MEMORY_UPLOAD_BATCH) {
+      setMessage(`Choose up to ${MAX_MEMORY_UPLOAD_BATCH} photos at a time.`);
       return;
     }
-    setPending(true); setMessage("");
+    uploading.current = true;
+    setPending(true); setMessage(""); setProgress(null); setFailures([]);
+    const valid = files.filter(file => ["image/jpeg", "image/png", "image/webp"].includes(file.type) && file.size > 0 && file.size <= MAX_MEMORY_IMAGE_BYTES);
+    const invalid = files.filter(file => !valid.includes(file)).map(file => ({ file, message: "Choose a JPG, PNG or WebP photo under 8 MB." }));
+    let reused = 0;
     try {
-      const result = await uploadSharedPhoto(file);
-      setAssets((current) => current.some(asset => asset.id === result.asset.id) ? current : [{ ...result.asset, createdAt: new Date() }, ...current]);
-      setMessage(result.duplicate ? "This photo is already in your Gallery. No extra copy was saved." : "Added to your shared gallery.");
-    } catch (error) { setMessage(error instanceof Error ? error.message : "Couldn’t add this photo."); }
-    finally { setPending(false); }
+      const failed = valid.length ? await uploadPhotoBatch(valid, result => {
+        if (result.duplicate) reused++;
+        setAssets(current => current.some(asset => asset.id === result.asset.id) ? current : [{ ...result.asset, createdAt: new Date() }, ...current]);
+      }, setProgress) : [];
+      setFailures([...invalid, ...failed]);
+      const added = valid.length - failed.length;
+      setMessage(`${added} photo${added === 1 ? "" : "s"} ready in Gallery.${reused ? ` ${reused} already saved; reused without extra copies.` : ""}${invalid.length + failed.length ? ` ${invalid.length + failed.length} couldn’t be added.` : ""}`);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Couldn’t add these photos.");
+    } finally {
+      uploading.current = false; setPending(false); setProgress(null);
+    }
   }
+
   return <section className="shared-gallery" aria-labelledby="gallery-title">
-    <div className="shared-gallery-heading"><div><p className="eyebrow">OUR LITTLE GALLERY</p><h1 id="gallery-title">Photos we keep close.</h1><p>Every photo is shared here once, ready to add to any memory later.</p></div>{uploadsEnabled && <button type="button" className="button gallery-upload-button" onClick={() => input.current?.click()} disabled={pending}>{pending ? <LoaderCircle className="media-spin" size={18} aria-hidden="true" /> : <ImagePlus size={18} aria-hidden="true" />}{pending ? "Adding…" : "Add photos"}</button>}</div>
-    <input ref={input} className="file-input" type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => { void upload(event.target.files?.[0]); event.target.value = ""; }} />
+    <div className="shared-gallery-heading"><div><p className="eyebrow">OUR LITTLE GALLERY</p><h1 id="gallery-title">Photos we keep close.</h1><p>Add up to 10 photos at a time, ready to use in any memory later.</p></div>{uploadsEnabled && <button type="button" className="button gallery-upload-button" onClick={() => input.current?.click()} disabled={pending}>{pending ? <LoaderCircle className="media-spin" size={18} aria-hidden="true" /> : <ImagePlus size={18} aria-hidden="true" />}{pending ? "Adding…" : "Add photos"}</button>}</div>
+    <input ref={input} className="file-input" type="file" multiple disabled={pending} accept="image/jpeg,image/png,image/webp" onChange={(event) => { void upload(Array.from(event.target.files ?? [])); event.target.value = ""; }} />
     <p className="gallery-status" role="status">{message}</p>
-    {assets.length ? <div className="gallery-grid" aria-label="Our shared photos">{assets.map((asset, index) => <button className={`gallery-tile gallery-tile-${index % 7}`} type="button" key={asset.id} onClick={() => { setActive(asset); viewer.current?.showModal(); }} aria-label="Open photo"><img src={`/api/media/${asset.id}`} alt="A photo from our shared gallery" loading={index < 4 ? "eager" : "lazy"} decoding="async" /></button>)}</div> : <div className="gallery-empty"><span>♡</span><h2>Our gallery is waiting.</h2><p>Add a photo you both love. You can use it in a memory whenever you want.</p>{uploadsEnabled && <button type="button" className="button" onClick={() => input.current?.click()}><ImagePlus size={18} aria-hidden="true" />Add our first photo</button>}</div>}
-    <dialog className="gallery-viewer" ref={viewer} onClose={() => setActive(null)} aria-label="Photo viewer">{active && <><button type="button" className="gallery-viewer-close" onClick={() => viewer.current?.close()} aria-label="Close photo"><X size={24} /></button><img src={`/api/media/${active.id}`} alt="A photo from our shared gallery" /><p>Kept together.</p><a className="button light" href={`/api/media/${active.id}/download`} referrerPolicy="no-referrer">Download photo</a></>}</dialog>
+    {pending && progress && <div className="media-batch-status" role="status"><p>{progress.waiting ? "Waiting a moment…" : "Adding photos…"} {progress.completed} / {progress.total}</p><progress value={progress.completed} max={progress.total} aria-label="Gallery photo upload progress" /></div>}
+    {!pending && failures.length > 0 && <div className="media-batch-status"><ul>{failures.map((failure, index) => <li key={index}>{failure.file.name}: {failure.message}</li>)}</ul><button className="button light" type="button" onClick={() => void upload(failures.map(failure => failure.file))}>Retry failed photos</button></div>}
+    {assets.length ? <div className="gallery-grid" aria-label="Our shared photos">{assets.map((asset, index) => <button className={`gallery-tile gallery-tile-${index % 7}`} type="button" key={asset.id} onClick={() => { setActive(asset); viewer.current?.showModal(); }} aria-label="Open photo"><img src={`/api/media/${asset.id}`} alt="A photo from our shared gallery" loading={index < 4 ? "eager" : "lazy"} decoding="async" /></button>)}</div> : <div className="gallery-empty"><span>♡</span><h2>Our gallery is waiting.</h2><p>Add a photo you both love. You can use it in a memory whenever you want.</p>{uploadsEnabled && <button type="button" className="button" disabled={pending} onClick={() => input.current?.click()}><ImagePlus size={18} aria-hidden="true" />Add our first photo</button>}</div>}
+    <dialog className="gallery-viewer" ref={viewer} onClose={() => setActive(null)} aria-label="Photo viewer">{active && <><div className="gallery-viewer-toolbar"><button type="button" className="gallery-viewer-close" onClick={() => viewer.current?.close()} aria-label="Close photo"><X size={24} /></button></div><div className="gallery-viewer-image"><img src={`/api/media/${active.id}`} alt="A photo from our shared gallery" /></div><div className="gallery-viewer-footer"><p>Kept together.</p><a className="button light" href={`/api/media/${active.id}/download`} referrerPolicy="no-referrer">Download photo</a></div></>}</dialog>
   </section>;
 }
