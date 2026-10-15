@@ -6195,3 +6195,9 @@ body:has(.memory-detail) .private-header {
     min-height: 214px;
   }
 }
+
+.media-batch-status { margin: 12px 0; overflow-wrap: anywhere; }
+.media-batch-status progress { width: 100%; accent-color: #a33e68; }
+.media-batch-status ul { padding-inline-start: 20px; max-height: 180px; overflow: auto; }
+.memory-photo-button { position: relative; }
+.memory-photo-more { position: absolute; inset: 0; display: grid; place-items: center; background: #41233288; color: #fff; font-weight: 700; pointer-events: none; }

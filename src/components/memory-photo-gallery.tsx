@@ -31,15 +31,16 @@ export function MemoryPhotoGallery({ photos }: { photos: Photo[] }) {
   function change(index: number) { setSelected((index + photos.length) % photos.length); }
   return <>
     <section className={`memory-photo-gallery memory-photo-count-${Math.min(photos.length, 4)}`} aria-label="Photos in this memory">
-      {photos.map((photo, index) => <button type="button" key={photo.id} className="memory-photo-button" onClick={() => setSelected(index)} aria-label={`Open photo ${index + 1}`}>
+      {photos.slice(0, 4).map((photo, index) => <button type="button" key={photo.id} className="memory-photo-button" onClick={() => setSelected(index)} aria-label={`Open photo ${index + 1}`}>
         <PrivatePhoto photo={photo} className="memory-photo-frame" />
+        {index === 3 && photos.length > 4 && <span className="memory-photo-more">+{photos.length - 4} photos</span>}
       </button>)}
     </section>
     <dialog ref={dialog} className="memory-photo-viewer" aria-label={active ? `Photo ${selected! + 1} of ${photos.length}` : "Photo viewer"} onClose={() => setSelected(null)}>
       {active && <div className="memory-photo-viewer-content">
         <button type="button" className="memory-viewer-close" onClick={() => setSelected(null)} aria-label="Close photo"><X size={24} aria-hidden="true" /></button>
         {photos.length > 1 && <button type="button" className="memory-viewer-arrow memory-viewer-previous" onClick={() => change(selected! - 1)} aria-label="Previous photo"><ChevronLeft size={28} aria-hidden="true" /></button>}
-        <PrivatePhoto photo={active} className="memory-viewer-image" />
+        <PrivatePhoto key={active.id} photo={active} className="memory-viewer-image" />
         {photos.length > 1 && <button type="button" className="memory-viewer-arrow memory-viewer-next" onClick={() => change(selected! + 1)} aria-label="Next photo"><ChevronRight size={28} aria-hidden="true" /></button>}
         {photos.length > 1 && <p className="memory-viewer-count">{selected! + 1} / {photos.length}</p>}
       </div>}
