@@ -9,9 +9,10 @@ type MemoryValues = {id: string; title: string; body: string; happenedOn: string
 export function MemoryForm({memory, mode, assets}: {memory: MemoryValues; mode: "create" | "edit"; assets: LibraryAsset[]}) {
   const [state, action, pending] = useActionState(saveMemory, initial);
   const [draft, setDraft] = useState(memory);
+  const [photosUploading, setPhotosUploading] = useState(false);
   const error = (key: string) => state.errors?.[key]?.join(" ");
   // Controlled fields preserve a draft after a rejected server action.
-  return <form action={action} className="private-form">
+  return <form action={action} className="private-form" onSubmit={event => { if (photosUploading) event.preventDefault(); }}>
     <input type="hidden" name="id" value={memory.id} />
     <input type="hidden" name="mode" value={mode} />
     <fieldset disabled={pending}>
@@ -28,10 +29,10 @@ export function MemoryForm({memory, mode, assets}: {memory: MemoryValues; mode: 
       <input id="location" name="location" value={draft.location ?? ""} onChange={e => setDraft({...draft, location: e.target.value})} maxLength={160} aria-invalid={!!error("location")} aria-describedby="location-error" placeholder="Our favourite café" />
       <small id="location-error" className="field-error">{error("location")}</small>
       <label className="check-row"><input type="checkbox" name="isMilestone" checked={draft.isMilestone} onChange={e => setDraft({...draft, isMilestone: e.target.checked})} /> <span>A milestone in Our Story</span></label>
-      <MediaPicker assets={assets} selectedIds={memory.assetIds} />
+      <MediaPicker assets={assets} selectedIds={memory.assetIds} onUploadingChange={setPhotosUploading} />
       <div className="memory-save-panel">
         <p>{mode === "create" ? "When you’re ready, this saves the words and selected photos together." : "This saves your words and selected photos together."}</p>
-        <button id="memory-save" className="button" type="submit">{pending ? "Saving…" : mode === "create" ? "Keep this memory ♡" : "Save changes"}</button>
+        <button id="memory-save" className="button" type="submit" disabled={photosUploading}>{photosUploading ? "Wait for photos…" : pending ? "Saving…" : mode === "create" ? "Keep this memory ♡" : "Save changes"}</button>
       </div>
     </fieldset>
     <p role="status" className="form-status">{state.message}</p>

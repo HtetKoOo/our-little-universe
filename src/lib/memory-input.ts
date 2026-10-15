@@ -1,3 +1,4 @@
+import { MAX_MEMORY_MEDIA } from "./media-input";
 import { z } from "zod";
 export const memoryInput = z.object({
   title: z.string().trim().min(1, "Give this memory a title.").max(120),
@@ -14,7 +15,7 @@ export const memoryInput = z.object({
     .transform((value) => value || null),
   isMilestone: z.boolean(),
 });
-export const memoryAssetIdsInput = z.array(z.uuid()).max(12);
+export const memoryAssetIdsInput = z.array(z.uuid()).max(MAX_MEMORY_MEDIA);
 export const birthdayInput = z.object({
   birthday: z.union([z.literal(""), z.iso.date("Choose a valid birthday.")]).transform((value) => value || null),
 });

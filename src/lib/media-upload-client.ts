@@ -32,6 +32,10 @@ export async function findDuplicatePhoto(file: File): Promise<LibraryAsset | nul
   return result.asset;
 }
 
+export class PhotoUploadError extends Error {
+  constructor(message: string, public readonly status: number) { super(message); }
+}
+
 export async function uploadSharedPhoto(file: File): Promise<{ asset: LibraryAsset; duplicate: boolean }> {
   const existing = await findDuplicatePhoto(file);
   if (existing) return { asset: existing, duplicate: true };
@@ -40,6 +44,6 @@ export async function uploadSharedPhoto(file: File): Promise<{ asset: LibraryAss
     signal: AbortSignal.timeout(75000),
   });
   const result = await response.json();
-  if (!response.ok) throw new Error(result.message ?? "Couldn’t add this photo.");
+  if (!response.ok) throw new PhotoUploadError(result.message ?? "Couldn’t add this photo.", response.status);
   return result;
 }
