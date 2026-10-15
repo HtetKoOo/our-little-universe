@@ -208,6 +208,19 @@ export const mediaAssets = pgTable(
     check("media_assets_resource_type", sql`${t.resourceType} in ('image', 'video')`),
   ],
 );
+// Durable direct-upload intents bind browser uploads to one member and source hash.
+export const mediaUploadIntents = pgTable("media_upload_intents", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  coupleId: uuid("couple_id").notNull().references(() => couples.id, { onDelete: "cascade" }),
+  userId: text("user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
+  contentHash: text("content_hash").notNull(),
+  expectedBytes: integer("expected_bytes").notNull(),
+  mime: text("mime").notNull(),
+  publicId: text("public_id").notNull(),
+  completedAt: timestamp("completed_at", { withTimezone: true }),
+  createdAt: createdAt(),
+}, t => [index("media_upload_intents_couple_created_idx").on(t.coupleId, t.createdAt)]);
+
 export const memoryMedia = pgTable(
   "memory_media",
   {

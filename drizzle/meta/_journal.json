@@ -113,6 +113,13 @@
       "when": 1791994375900,
       "tag": "0015_media_deduplication",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1792065643909,
+      "tag": "0016_direct_media_uploads",
+      "breakpoints": true
     }
   ]
 }

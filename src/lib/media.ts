@@ -5,6 +5,7 @@ import type { UploadApiResponse } from "cloudinary";
 import { coupleMembers, couples, mediaAssets, memoryMedia } from "./db/schema";
 import { getCloudinary } from "./cloudinary";
 import { getDb } from "./db";
+import { PREVIEW_TRANSFORMATION } from "./direct-media-input";
 import { imageFormat, MAX_MEMORY_IMAGE_BYTES } from "./media-input";
 
 export type MediaActor = { coupleId: string; userId: string };
@@ -167,4 +168,20 @@ export async function uploadMemoryImage(actor: MediaActor, bytes: Uint8Array) {
     // already committed a row referring to it. A retry reuses the same object.
     throw new Error("save-failed");
   }
+}
+
+// Keep original files off Vercel's response path. Only a fixed-size private
+// derivative is proxied for display; originals use the download redirect.
+export function mediaPreviewUrl(asset: Pick<MediaAsset, "publicId" | "format">) {
+  const cloud = getCloudinary();
+  if (asset.publicId.startsWith("original_assets/")) {
+    return cloud.url(asset.publicId, {
+      secure: true, resource_type: "image", type: "authenticated", sign_url: true,
+      format: "jpg",
+      transformation: PREVIEW_TRANSFORMATION,
+    });
+  }
+  return cloud.utils.private_download_url(asset.publicId, asset.format, {
+    resource_type:"image",type:"authenticated",expires_at:Math.floor(Date.now()/1000)+60,attachment:false,
+  });
 }

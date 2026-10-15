@@ -1,5 +1,5 @@
 import { z } from "zod";
-export const MAX_PHOTO_BYTES = 4 * 1024 * 1024;
+export const MAX_PHOTO_BYTES = 8 * 1024 * 1024;
 export const cropInput = z.object({
   zoom: z.number().min(1).max(3),
   x: z.number().min(0).max(100),
@@ -18,11 +18,11 @@ export type SavedHeartPhoto = {
 export const MAX_HEART_PHOTOS = 3;
 export const savedHeartPhotoInput = z.object({
   id: z.uuid(),
-  width: z.number().int().positive().max(2400),
-  height: z.number().int().positive().max(2400),
+  width: z.number().int().positive().max(100000),
+  height: z.number().int().positive().max(100000),
   format: z.enum(["jpg", "png", "webp"]),
   crop: cropInput,
-});
+}).refine(photo => photo.width * photo.height <= 40_000_000, "Choose a photo under 40 megapixels.");
 export const heartPhotosInput = z.array(savedHeartPhotoInput).max(MAX_HEART_PHOTOS);
 export const photoCollectionEditInput = z.object({
   revision: z.number().int().min(0).max(2147483646),

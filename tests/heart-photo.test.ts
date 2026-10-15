@@ -69,7 +69,7 @@ test("heart photo collections are limited to three validated photos", () => {
   assert.equal(heartPhotosInput.safeParse([{ ...photo, width: 0 }]).success, false);
   // Shared library photos can exceed the legacy heart uploader's 1600px limit.
   assert.equal(heartPhotosInput.safeParse([{ ...photo, width: 2400, height: 1800 }]).success, true);
-  assert.equal(heartPhotosInput.safeParse([{ ...photo, width: 2401 }]).success, false);
+  assert.equal(heartPhotosInput.safeParse([{ ...photo, width: 100001 }]).success, false);
 });
 test("image headers allow only supported raster formats", () => {
   assert.equal(imageMime(new Uint8Array([255, 216, 255, 224])), "image/jpeg");

@@ -8,7 +8,7 @@ import { getAuth } from "@/lib/auth";
 import { requireCouple } from "@/lib/authorization";
 import { getCloudinary } from "@/lib/cloudinary";
 import { getDb } from "@/lib/db";
-import { couples, heartPhotoUploads, littleQuestionRounds, mediaAssets, memories, memoryMedia, user, verification } from "@/lib/db/schema";
+import { couples, heartPhotoUploads, littleQuestionRounds, mediaAssets, memories, memoryMedia, mediaUploadIntents, user, verification } from "@/lib/db/schema";
 import { sendCleanupCode } from "@/lib/email";
 import { photoConfigured, publicIdFor } from "@/lib/heart-photo";
 
@@ -25,6 +25,7 @@ async function clearTestData(actor: Awaited<ReturnType<typeof requireCouple>>) {
   const assets = await db.select({ publicId: mediaAssets.publicId, resourceType: mediaAssets.resourceType }).from(mediaAssets).where(eq(mediaAssets.coupleId, actor.coupleId));
   const heartIds = [...(couple?.photos ?? []), ...(couple?.legacyPhoto ? [couple.legacyPhoto] : [])].map((photo) => photo.id);
   try {
+    await db.delete(mediaUploadIntents).where(eq(mediaUploadIntents.coupleId, actor.coupleId));
     await db.delete(memoryMedia).where(eq(memoryMedia.coupleId, actor.coupleId));
     await db.delete(memories).where(eq(memories.coupleId, actor.coupleId));
     await db.delete(mediaAssets).where(eq(mediaAssets.coupleId, actor.coupleId));
