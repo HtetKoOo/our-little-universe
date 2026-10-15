@@ -104,3 +104,36 @@ retroactively. Renamed identical files match; edited or recompressed files do no
 If the provider upload succeeds but the database write fails, retry the same file:
 the provider object is retained for reuse rather than deleting a file another
 request may already reference.
+
+### Direct photo uploads
+
+Apply `0016_direct_media_uploads.sql` with `pnpm db:migrate` **before** deploying
+this update. It adds the private upload-intent ledger. Existing photo records and
+Cloudinary credentials remain valid; no unsigned upload preset or public bucket
+is needed.
+
+Gallery, Memory, and main-card photo uploads now request a signed permission,
+POST the file directly from the browser to Cloudinary, then send only an intent
+ID to the app to finalize it. Supported files are JPG, PNG and WebP, up to 8 MiB
+and 40 megapixels. The new flow preserves original bytes and generates a separate
+1600px JPEG preview for display. Original downloads go directly to Cloudinary;
+legacy, resized photos remain available at their existing quality.
+
+Finalization looks up the authenticated provider asset independently, checks
+size, dimensions and MIME, downloads the source server-to-server and verifies
+SHA-256 before inserting a library row. Verification consumes provider download
+bandwidth once per new photo; it does not send file bytes through a browser-to-
+Vercel upload request. Browser-provided URLs and metadata are never trusted.
+Upload permissions are rate limited (three-second spacing and 120 intents per
+couple per hour); app finalization expires after 15 minutes. Cloudinary enforces
+its own signed-request lifetime separately.
+
+Retries reuse the same couple-scoped original object and library hash. The
+`media:cleanup` command removes old intents for files already in the library.
+Abandoned originals/intents are retained for investigation, rather than deleting
+an object that could be used by an overlapping retry. Review abandoned uploads
+in maintenance if storage usage grows unexpectedly.
+
+After deployment, test a supported photo between 4.5 MB and 8 MiB from Memory and
+Gallery, download it and compare its checksum with the source, re-upload it from
+the other entry point, and verify that a different couple cannot access it.

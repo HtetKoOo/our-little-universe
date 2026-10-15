@@ -51,7 +51,7 @@ async function mutate(request: Request) {
           "Our photo changed. Reopen the editor to see the latest photo.",
           409,
         );
-      const bytes = await limitedBody(request);
+      const bytes = await limitedBody(request, 4 * 1024 * 1024);
       const mime = imageMime(bytes);
       if (!mime || request.headers.get("content-type") !== mime)
         return reply("Choose a JPG, PNG or WebP photo.", 415);

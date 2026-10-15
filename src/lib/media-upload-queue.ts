@@ -6,7 +6,7 @@ export type FailedPhotoUpload = { file: File; message: string };
 export type UploadProgress = { completed: number; total: number; filename: string; waiting: boolean };
 
 // Sequential requests avoid competing with the couple-wide three-second gate.
-// Partner uploads may still hit that gate: retry only explicit 429 responses.
+// Retry temporary failures too; content-addressed uploads make retries safe.
 export async function uploadPhotoBatch(
   files: File[],
   onUploaded: (result: UploadResult) => void,
@@ -32,7 +32,10 @@ export async function uploadPhotoBatch(
       for (let attempt = 0; attempt < 4; attempt++) {
         try { result = await upload(file); break; }
         catch (error) {
-          if (!(error instanceof PhotoUploadError) || error.status !== 429 || attempt === 3) throw error;
+          const temporary = error instanceof PhotoUploadError
+            ? [408, 425, 429, 500, 502, 503, 504].includes(error.status)
+            : error instanceof TypeError || (error instanceof Error && ["TimeoutError", "AbortError"].includes(error.name));
+          if (!temporary || attempt === 3) throw error;
           onProgress({ completed, total: files.length, filename: file.name, waiting: true });
           await wait(3100 * (attempt + 1));
           onProgress({ completed, total: files.length, filename: file.name, waiting: false });

@@ -21,18 +21,33 @@ test("a duplicate lookup hashes file bytes, ignores filename, and avoids uploadi
   assert.deepEqual(calls, ["/api/media/check", "/api/media/check"]);
 });
 
-test("a new file is checked before uploading its unchanged bytes", async (context) => {
+test("original file goes straight to Cloudinary and only metadata reaches app endpoints", async (context) => {
   const file = new File(["new pixels"], "photo.jpg", { type: "image/jpeg" });
   const calls: string[] = [];
+  const uploadUrl = "https://api.cloudinary.com/v1_1/test-cloud/image/upload";
   context.mock.method(globalThis, "fetch", async (url: string, init: RequestInit) => {
     calls.push(url);
     if (url === "/api/media/check") return Response.json({ asset: null });
-    assert.equal(init.body, file);
-    assert.deepEqual(init.headers, { "Content-Type": "image/jpeg" });
-    return Response.json({ asset, duplicate: false }, { status: 201 });
+    if (url === "/api/media/prepare") {
+      const input = JSON.parse(init.body as string);
+      assert.equal(input.bytes,file.size);assert.equal(input.mime,file.type);
+      assert.equal(input.hash,createHash("sha256").update("new pixels").digest("hex"));
+      return Response.json({intentId:"intent",uploadUrl,fields:{signature:"signed",type:"authenticated"}});
+    }
+    if (url === uploadUrl) {
+      assert.ok(init.body instanceof FormData);
+      const uploaded=init.body.get("file") as File;
+      assert.equal(await uploaded.text(),"new pixels");
+      assert.equal(init.body.get("type"),"authenticated");
+      assert.equal(init.credentials,"omit");
+      return Response.json({public_id:"provider-photo"});
+    }
+    assert.equal(url,"/api/media/complete");
+    assert.deepEqual(JSON.parse(init.body as string),{intentId:"intent"});
+    return Response.json({asset,duplicate:false});
   });
-  assert.equal((await uploadSharedPhoto(file)).duplicate, false);
-  assert.deepEqual(calls, ["/api/media/check", "/api/media"]);
+  assert.equal((await uploadSharedPhoto(file)).duplicate,false);
+  assert.deepEqual(calls,["/api/media/check","/api/media/prepare",uploadUrl,"/api/media/complete"]);
 });
 
 test("failed duplicate checks stop before any upload", async (context) => {
@@ -94,4 +109,32 @@ test("separate file selections keep their own results when replies arrive out of
   finishFirst(Response.json({ asset }));
   assert.deepEqual(await resolveDuplicatePhotoCheck(first), asset);
   assert.equal(await resolveDuplicatePhotoCheck(second), null);
+});
+
+
+test("plain-text hosting size errors stay readable", async (context) => {
+ context.mock.method(globalThis,"fetch",async(url:string)=>url==="/api/media/check"?Response.json({asset:null}):new Response("FUNCTION_PAYLOAD_TOO_LARGE",{status:413}));
+ await assert.rejects(uploadSharedPhoto(new File(["pixels"],"photo.jpg")),/too large.*under 8 MB/);
+});
+
+
+test("a duplicate completed during preparation skips the provider upload",async(context)=>{
+ const calls:string[]=[];
+ context.mock.method(globalThis,"fetch",async(url:string)=>{
+  calls.push(url);return Response.json(url==="/api/media/check"?{asset:null}:{asset,duplicate:true});
+ });
+ assert.equal((await uploadSharedPhoto(new File(["pixels"],"photo.jpg"))).duplicate,true);
+ assert.deepEqual(calls,["/api/media/check","/api/media/prepare"]);
+});
+
+test("a failed provider upload never finalizes an unverified photo",async(context)=>{
+ const calls:string[]=[];
+ context.mock.method(globalThis,"fetch",async(url:string)=>{
+  calls.push(url);
+  if(url==="/api/media/check")return Response.json({asset:null});
+  if(url==="/api/media/prepare")return Response.json({intentId:"intent",uploadUrl:"https://api.cloudinary.com/v1_1/test/image/upload",fields:{signature:"signed"}});
+  return Response.json({error:{message:"Unavailable"}},{status:503});
+ });
+ await assert.rejects(uploadSharedPhoto(new File(["pixels"],"photo.jpg")),/temporarily unavailable/);
+ assert.equal(calls.includes("/api/media/complete"),false);
 });

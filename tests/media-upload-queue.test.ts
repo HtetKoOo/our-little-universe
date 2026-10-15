@@ -62,3 +62,20 @@ test("cooldown retries are bounded and eleven-file batches are refused", async (
  await assert.rejects(uploadPhotoBatch(files(11),()=>{},()=>{}, {upload,wait:async()=>{}}),/between 1 and 10/);
  assert.equal(attempts,4);
 });
+
+
+test("temporary connection and gateway errors recover automatically", async () => {
+ let attempts=0;
+ const attached:string[]=[];
+ const failed=await uploadPhotoBatch(files(1),value=>attached.push(value.asset.id),()=>{}, {
+  upload:async file=>{attempts++;if(attempts===1)throw new TypeError("Failed to fetch");if(attempts===2)throw new PhotoUploadError("Gateway timeout",504);return result(file.name);},
+  wait:async()=>{},
+ });
+ assert.equal(attempts,3);assert.equal(failed.length,0);assert.deepEqual(attached,["0.jpg"]);
+});
+
+test("oversized file rejection is not retried", async () => {
+ let attempts=0;
+ const failed=await uploadPhotoBatch(files(1),()=>{},()=>{}, {upload:async()=>{attempts++;throw new PhotoUploadError("Too large",413);},wait:async()=>{}});
+ assert.equal(attempts,1);assert.equal(failed.length,1);
+});
