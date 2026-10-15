@@ -18,8 +18,8 @@ export type SavedHeartPhoto = {
 export const MAX_HEART_PHOTOS = 3;
 export const savedHeartPhotoInput = z.object({
   id: z.uuid(),
-  width: z.number().int().positive().max(1600),
-  height: z.number().int().positive().max(1600),
+  width: z.number().int().positive().max(2400),
+  height: z.number().int().positive().max(2400),
   format: z.enum(["jpg", "png", "webp"]),
   crop: cropInput,
 });

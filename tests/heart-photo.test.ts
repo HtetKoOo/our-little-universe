@@ -13,6 +13,7 @@ import {
 test("landscape and portrait crops always cover the heart", () => {
   for (const [w, h] of [
     [1600, 900],
+    [2400, 1800],
     [900, 1600],
     [100, 100],
   ]) {
@@ -66,6 +67,9 @@ test("heart photo collections are limited to three validated photos", () => {
   assert.equal(heartPhotosInput.safeParse([photo, photo, photo]).success, true);
   assert.equal(heartPhotosInput.safeParse([photo, photo, photo, photo]).success, false);
   assert.equal(heartPhotosInput.safeParse([{ ...photo, width: 0 }]).success, false);
+  // Shared library photos can exceed the legacy heart uploader's 1600px limit.
+  assert.equal(heartPhotosInput.safeParse([{ ...photo, width: 2400, height: 1800 }]).success, true);
+  assert.equal(heartPhotosInput.safeParse([{ ...photo, width: 2401 }]).success, false);
 });
 test("image headers allow only supported raster formats", () => {
   assert.equal(imageMime(new Uint8Array([255, 216, 255, 224])), "image/jpeg");

@@ -1,11 +1,10 @@
 import "server-only";
-import { randomUUID } from "node:crypto";
 import { and, eq, lt, sql } from "drizzle-orm";
-import type { UploadApiResponse } from "cloudinary";
 import { getAuth, authConfigured } from "./auth";
 import { getDb } from "./db";
-import { coupleMembers, couples, heartPhotoUploads } from "./db/schema";
+import { coupleMembers, couples, heartPhotoUploads, mediaAssets } from "./db/schema";
 import { getCloudinary } from "./cloudinary";
+import { uploadMemoryImage, findMediaAsset } from "./media";
 import { defaultCrop, MAX_HEART_PHOTOS, type SavedHeartPhoto } from "./heart-photo-input";
 
 export async function photoActor(headers: Headers) {
@@ -26,37 +25,37 @@ export const publicIdFor = (id: string) => `heart_photos/${id}`;
 export function photoConfigured() {
   return Boolean(process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET);
 }
-export async function uploadHeartPhoto(actor: PhotoActor, bytes: Uint8Array) {
-  const id = randomUUID();
-  // Durable intent also bounds per-couple upload attempts across server instances.
-  const inserted = await getDb().execute(sql`with allowed as (
-    update ${couples} set photo_upload_at=now()
-    where ${couples.id}=${actor.coupleId}::uuid
-      and (photo_upload_at is null or photo_upload_at < now() - interval '10 seconds')
-      and (select count(*) from ${heartPhotoUploads} where ${heartPhotoUploads.coupleId}=${actor.coupleId}::uuid and ${heartPhotoUploads.createdAt} > now() - interval '1 hour') < 20
-      and exists(select 1 from ${coupleMembers} where ${coupleMembers.coupleId}=${couples.id} and ${coupleMembers.userId}=${actor.userId})
-    returning id
-  ) insert into ${heartPhotoUploads} (id,couple_id) select ${id}::uuid,id from allowed returning id`);
-  if (!inserted.rows.length) throw new Error("upload-rate-limit");
-  const result = await new Promise<UploadApiResponse>((resolve, reject) => {
-    const stream = getCloudinary().uploader.upload_stream({
-      public_id: publicIdFor(id), resource_type: "image", type: "authenticated",
-      overwrite: false, allowed_formats: ["jpg", "png", "webp"], format: "jpg",
-      transformation: [{ width: 1600, height: 1600, crop: "limit" }, { flags: "strip_profile" }],
-      timeout: 45000,
-    }, (error, uploaded) => error || !uploaded ? reject(new Error("upload-failed")) : resolve(uploaded));
-    stream.on("error", () => reject(new Error("upload-failed")));
-    stream.end(Buffer.from(bytes));
-  });
-  const format = result.format === "jpg" || result.format === "png" || result.format === "webp" ? result.format : null;
-  if (result.public_id !== publicIdFor(id) || result.type !== "authenticated" || result.resource_type !== "image" || !format || !result.width || !result.height || result.width > 1600 || result.height > 1600 || result.bytes > 8 * 1024 * 1024)
-    throw new Error("invalid-provider-result");
-  return { id, width: result.width, height: result.height, format, crop: defaultCrop } satisfies SavedHeartPhoto;
+// Register legacy heart files in the shared library without copying image bytes.
+// The provider supplies accurate size; a failed import leaves the old photo intact.
+export async function preserveHeartPhotos(actor: { coupleId: string; userId: string }, photos: SavedHeartPhoto[]) {
+  for (const photo of photos) {
+    if (await findMediaAsset(actor, photo.id)) continue;
+    const resource = await getCloudinary().api.resource(publicIdFor(photo.id), {
+      resource_type: "image", type: "authenticated",
+    });
+    await getDb().insert(mediaAssets).values({
+      id: photo.id, coupleId: actor.coupleId, createdBy: actor.userId,
+      publicId: publicIdFor(photo.id), resourceType: "image", deliveryType: "authenticated",
+      format: photo.format, width: resource.width, height: resource.height, bytes: resource.bytes,
+    }).onConflictDoNothing();
+  }
 }
-export async function saveHeartPhotos(actor: PhotoActor, revision: number, photos: SavedHeartPhoto[], newUploadId?: string) {
-  if (photos.length > MAX_HEART_PHOTOS) return undefined;
-  const [updated] = await getDb().update(couples).set({ heartPhotos: photos, heartPhoto: null, photoRevision: sql`${couples.photoRevision} + 1` })
-    .where(and(photoScope(actor, revision), newUploadId ? sql`exists(select 1 from ${heartPhotoUploads} where ${heartPhotoUploads.id}=${newUploadId}::uuid and ${heartPhotoUploads.coupleId}=${actor.coupleId}::uuid and ${heartPhotoUploads.createdAt} > now() - interval '30 minutes')` : undefined))
+
+export async function uploadHeartPhoto(actor: PhotoActor, bytes: Uint8Array) {
+  const asset = await uploadMemoryImage(actor, bytes);
+  return { id: asset.id, width: asset.width!, height: asset.height!, format: asset.format as SavedHeartPhoto["format"], crop: defaultCrop };
+}
+export async function saveHeartPhotos(actor: PhotoActor, revision: number, photos: SavedHeartPhoto[]) {
+  if (photos.length > MAX_HEART_PHOTOS || new Set(photos.map(photo => photo.id)).size !== photos.length) return undefined;
+  await preserveHeartPhotos(actor, actor.photos);
+  const verified: SavedHeartPhoto[] = [];
+  for (const photo of photos) {
+    const asset = await findMediaAsset(actor, photo.id);
+    if (!asset || asset.resourceType !== "image" || !asset.width || !asset.height) return undefined;
+    verified.push({ id: asset.id, width: asset.width, height: asset.height, format: asset.format as SavedHeartPhoto["format"], crop: photo.crop });
+  }
+  const [updated] = await getDb().update(couples).set({ heartPhotos: verified, heartPhoto: null, photoRevision: sql`${couples.photoRevision} + 1` })
+    .where(photoScope(actor, revision))
     .returning({ revision: couples.photoRevision });
   return updated;
 }
@@ -66,7 +65,7 @@ export async function cleanupHeartPhotos(retiredId?: string) {
   const db = getDb();
   const candidates = await db.select({ id: heartPhotoUploads.id }).from(heartPhotoUploads)
     .where(and(retiredId ? eq(heartPhotoUploads.id, retiredId) : lt(heartPhotoUploads.createdAt, new Date(Date.now() - 60 * 60 * 1000)),
-      sql`not exists(select 1 from ${couples} where ${couples.heartPhotos} @> jsonb_build_array(jsonb_build_object('id', ${heartPhotoUploads.id}::text)) or ${couples.heartPhoto}->>'id'=${heartPhotoUploads.id}::text)`)).limit(2);
+      sql`not exists(select 1 from ${mediaAssets} where ${mediaAssets.id}=${heartPhotoUploads.id}) and not exists(select 1 from ${couples} where ${couples.heartPhotos} @> jsonb_build_array(jsonb_build_object('id', ${heartPhotoUploads.id}::text)) or ${couples.heartPhoto}->>'id'=${heartPhotoUploads.id}::text)`)).limit(2);
   let removed = 0;
   for (const { id } of candidates) {
     try {

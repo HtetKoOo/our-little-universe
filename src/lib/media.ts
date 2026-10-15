@@ -1,5 +1,5 @@
 import "server-only";
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { and, desc, eq, sql } from "drizzle-orm";
 import type { UploadApiResponse } from "cloudinary";
 import { coupleMembers, couples, mediaAssets, memoryMedia } from "./db/schema";
@@ -67,9 +67,23 @@ export async function listMemoryMedia(actor: MediaActor, memoryId: string) {
     .orderBy(memoryMedia.position);
 }
 
+export async function findMediaByHash(actor: MediaActor, contentHash: string) {
+  const [asset] = await getDb().select().from(mediaAssets).where(and(
+    eq(mediaAssets.coupleId, actor.coupleId), eq(mediaAssets.contentHash, contentHash),
+    sql`exists(select 1 from ${coupleMembers} where ${coupleMembers.coupleId}=${mediaAssets.coupleId} and ${coupleMembers.userId}=${actor.userId})`,
+  )).limit(1);
+  return asset ?? null;
+}
+
 export async function uploadMemoryImage(actor: MediaActor, bytes: Uint8Array) {
   if (!mediaConfigured()) throw new Error("media-not-configured");
+  const contentHash = createHash("sha256").update(bytes).digest("hex");
+  const existing = await findMediaByHash(actor, contentHash);
+  if (existing) return { ...existing, duplicate: true };
   const id = randomUUID();
+  // Same couple + exact bytes always target one provider object, even across
+  // simultaneous requests or a retry after a database failure.
+  const publicId = `memory_assets/${actor.coupleId}/${contentHash}`;
   // The same short cooldown protects a couple from accidental repeated taps on
   // slow mobile connections. It is enforced in SQL across server instances.
   const allowed = await getDb().execute(sql`
@@ -86,7 +100,7 @@ export async function uploadMemoryImage(actor: MediaActor, bytes: Uint8Array) {
     result = await new Promise<UploadApiResponse>((resolve, reject) => {
       const stream = getCloudinary().uploader.upload_stream(
         {
-          public_id: mediaPublicId(id),
+          public_id: publicId,
           resource_type: "image",
           type: "authenticated",
           overwrite: false,
@@ -111,7 +125,7 @@ export async function uploadMemoryImage(actor: MediaActor, bytes: Uint8Array) {
 
   const format = imageFormat(`image/${result.format === "jpg" ? "jpeg" : result.format}`);
   if (
-    result.public_id !== mediaPublicId(id) ||
+    result.public_id !== publicId ||
     result.type !== "authenticated" ||
     result.resource_type !== "image" ||
     !format ||
@@ -123,13 +137,6 @@ export async function uploadMemoryImage(actor: MediaActor, bytes: Uint8Array) {
     result.bytes < 1 ||
     result.bytes > MAX_MEMORY_IMAGE_BYTES
   ) {
-    await getCloudinary().uploader
-      .destroy(mediaPublicId(id), {
-        resource_type: "image",
-        type: "authenticated",
-        invalidate: true,
-      })
-      .catch(() => undefined);
     throw new Error("invalid-provider-result");
   }
 
@@ -140,7 +147,8 @@ export async function uploadMemoryImage(actor: MediaActor, bytes: Uint8Array) {
         id,
         coupleId: actor.coupleId,
         createdBy: actor.userId,
-        publicId: mediaPublicId(id),
+        publicId,
+        contentHash,
         resourceType: "image",
         deliveryType: "authenticated",
         format,
@@ -148,16 +156,15 @@ export async function uploadMemoryImage(actor: MediaActor, bytes: Uint8Array) {
         width: result.width,
         height: result.height,
       })
+      .onConflictDoNothing()
       .returning();
-    return asset;
+    if (asset) return { ...asset, duplicate: false };
+    const winner = await findMediaByHash(actor, contentHash);
+    if (winner) return { ...winner, duplicate: true };
+    throw new Error("save-failed");
   } catch {
-    await getCloudinary().uploader
-      .destroy(mediaPublicId(id), {
-        resource_type: "image",
-        type: "authenticated",
-        invalidate: true,
-      })
-      .catch(() => undefined);
+    // Do not delete a deterministic object: a concurrent request may have
+    // already committed a row referring to it. A retry reuses the same object.
     throw new Error("save-failed");
   }
 }

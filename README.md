@@ -84,3 +84,23 @@ References: [Next.js installation](https://nextjs.org/docs/app/getting-started/i
 ### Restricted macOS development environments
 
 If the development watcher reports `EMFILE`, run `WATCHPACK_POLLING=true pnpm run dev`. The preview in this session was checked with polling enabled. This avoids changing system-wide file limits.
+
+### Shared photo duplicate detection
+
+Before deploying the Gallery update, run `pnpm db:migrate` against the intended
+application database to apply `0015_media_deduplication.sql`. It adds a nullable
+SHA-256 hash and a unique constraint per couple; it does not delete existing photos.
+
+Gallery, memory attachments, and main-card uploads reuse the same library asset
+when the original uploaded bytes match. The browser checks before sending the file;
+the server computes the fingerprint independently. A deterministic, couple-scoped
+Cloudinary public ID with overwrite disabled and the database unique constraint
+prevent simultaneous uploads from creating separate copies. Existing rate limits
+still apply, so a simultaneous request can ask the user to retry.
+
+Older photos have no source-file hash because previous uploads resized the source.
+They remain available, but this feature cannot identify their original bytes
+retroactively. Renamed identical files match; edited or recompressed files do not.
+If the provider upload succeeds but the database write fails, retry the same file:
+the provider object is retained for reuse rather than deleting a file another
+request may already reference.

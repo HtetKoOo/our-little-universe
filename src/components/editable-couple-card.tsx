@@ -1,6 +1,7 @@
 "use client";
 import { useActionState, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import type { LibraryAsset } from "./media-picker";
 import { HeartPhotoEditor } from "./heart-photo-editor";
 import type { SavedHeartPhoto } from "@/lib/heart-photo-input";
 import { Pencil } from "lucide-react";
@@ -10,6 +11,7 @@ import { saveCardText } from "@/app/space/customize/actions";
 import styles from "./inline-card-editor.module.css";
 export function EditableCoupleCard({
   text,
+  library,
   revision,
   photos,
   photoRevision,
@@ -17,6 +19,7 @@ export function EditableCoupleCard({
   uploadsEnabled,
   ...props
 }: {
+  library: LibraryAsset[];
   text: CardText;
   revision: number;
   photos: SavedHeartPhoto[];
@@ -144,7 +147,7 @@ export function EditableCoupleCard({
         }
       />
     </form>
-    {photoEditing && <HeartPhotoEditor ready={photoReady} uploadsEnabled={uploadsEnabled} photos={photos} revision={photoRevision} onClose={() => setPhotoEditing(false)} onSaved={() => {setPhotoEditing(false); router.refresh();}} />}
+    {photoEditing && <HeartPhotoEditor library={library} ready={photoReady} uploadsEnabled={uploadsEnabled} photos={photos} revision={photoRevision} onClose={() => setPhotoEditing(false)} onSaved={() => {setPhotoEditing(false); router.refresh();}} />}
     </>
   );
 }

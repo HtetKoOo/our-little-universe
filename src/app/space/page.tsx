@@ -1,4 +1,5 @@
-import { readHeartPhoto, photoConfigured } from "@/lib/heart-photo";
+import { listMediaAssets } from "@/lib/media";
+import { readHeartPhoto, photoConfigured, preserveHeartPhotos } from "@/lib/heart-photo";
 import { requireCouple } from "@/lib/authorization";
 import { calendarDate } from "@/lib/dates";
 import { defaultCardText } from "@/lib/card-text";
@@ -10,12 +11,15 @@ import { normalizeHomeWidgets } from "@/lib/home-widgets";
 export default async function Space() {
   const couple = await requireCouple();
   const heart = await readHeartPhoto(couple);
+  await preserveHeartPhotos(couple, heart.photos ?? []);
+  const library = await listMediaAssets(couple);
   const snapshot = await homeMemorySnapshot();
 
   return (
     <section className="space-home">
       <EditableCoupleCard
         key={`${couple.cardRevision}-${heart.revision}`}
+        library={library.map(({id, width, height, format}) => ({id, width, height, format}))}
         photos={heart.photos ?? []}
         photoRevision={heart.revision}
         photoReady={heart.ready}
@@ -41,11 +45,7 @@ export default async function Space() {
         galleryPhotoSrcs={snapshot.galleryPhotoIds.map(
           (id) => `/api/media/${id}`,
         )}
-        heartPhotoSrc={
-          heart.photos?.[0]
-            ? `/api/heart-photo/${heart.photos[0].id}`
-            : undefined
-        }
+
       />
     </section>
   );

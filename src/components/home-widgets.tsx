@@ -17,13 +17,13 @@ function GalleryPhoto({ src, className }: { src: string; className: string }) {
   </span>;
 }
 
-export function HomeWidgets({ config, latest, milestone, memoryCount, heartPhotoSrc, favoriteCoverSrc, galleryPhotoSrcs }: { config: HomeWidgetConfig[]; latest: Memory; milestone: Memory; memoryCount: number; heartPhotoSrc?: string; favoriteCoverSrc?: string; galleryPhotoSrcs: string[] }) {
+export function HomeWidgets({ config, latest, milestone, memoryCount, favoriteCoverSrc, galleryPhotoSrcs }: { config: HomeWidgetConfig[]; latest: Memory; milestone: Memory; memoryCount: number; favoriteCoverSrc?: string; galleryPhotoSrcs: string[] }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(config);
   const [message, setMessage] = useState("");
   const [pending, startTransition] = useTransition();
   const favorite = milestone ?? latest;
-  const photoSources = galleryPhotoSrcs.length ? galleryPhotoSrcs : heartPhotoSrc ? [heartPhotoSrc] : [];
+  const photoSources = galleryPhotoSrcs;
   const active = draft.filter(({ visible }) => visible);
   const move = (index: number, direction: -1 | 1) => setDraft((items) => {
     const target = index + direction;

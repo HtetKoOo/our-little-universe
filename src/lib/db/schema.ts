@@ -197,10 +197,12 @@ export const mediaAssets = pgTable(
     width: integer("width"),
     height: integer("height"),
     durationMs: integer("duration_ms"),
+    contentHash: text("content_hash"),
     createdAt: createdAt(),
   },
   (t) => [
     unique("media_asset_couple_unique").on(t.id, t.coupleId),
+    unique("media_assets_couple_hash_unique").on(t.coupleId, t.contentHash),
     index("media_assets_couple_created_idx").on(t.coupleId, t.createdAt),
     check("media_assets_authenticated_only", sql`${t.deliveryType} = 'authenticated'`),
     check("media_assets_resource_type", sql`${t.resourceType} in ('image', 'video')`),
