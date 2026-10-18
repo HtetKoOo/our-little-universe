@@ -2749,26 +2749,19 @@ body:has(.memory-detail) .private-header {
 .gallery-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-auto-flow: dense;
   gap: 10px;
   margin-top: 27px;
 }
 .gallery-tile {
   position: relative;
-  min-height: 132px;
+  aspect-ratio: 1;
+  min-height: 0;
   overflow: hidden;
   padding: 0;
-  border: 0;
-  border-radius: 20px;
+  border: 1px solid #efcfdd;
+  border-radius: 14px;
   background: #f4e4ea;
   box-shadow: 0 6px 18px #6d30420d;
-}
-.gallery-tile:nth-child(5n + 1) {
-  grid-row: span 2;
-  min-height: 274px;
-}
-.gallery-tile:nth-child(7n + 3) {
-  grid-column: span 2;
 }
 .gallery-tile::after {
   content: "";
@@ -2783,6 +2776,8 @@ body:has(.memory-detail) .private-header {
   opacity: 1;
 }
 .gallery-tile img {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
@@ -4570,19 +4565,13 @@ body:has(.memory-detail) .private-header {
     justify-content: center;
   }
   .gallery-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 8px;
     margin-top: 22px;
   }
   .gallery-tile {
-    min-height: 145px;
-    border-radius: 17px;
-  }
-  .gallery-tile:nth-child(5n + 1) {
-    min-height: 298px;
-  }
-  .gallery-tile:nth-child(7n + 3) {
-    grid-column: span 1;
+    min-height: 0;
+    border-radius: 12px;
   }
   .private-heading {
     flex-wrap: wrap;
@@ -6103,11 +6092,7 @@ body:has(.memory-detail) .private-header {
   }
 
   .gallery-tile {
-    min-height: 160px;
-  }
-
-  .gallery-tile:nth-child(5n + 1) {
-    min-height: 334px;
+    min-height: 0;
   }
 
   .more-links,
@@ -6250,3 +6235,7 @@ body:has(.memory-detail) .private-header {
 .media-batch-status ul { padding-inline-start: 20px; max-height: 180px; overflow: auto; }
 .memory-photo-button { position: relative; }
 .memory-photo-more { position: absolute; inset: 0; display: grid; place-items: center; background: #41233288; color: #fff; font-weight: 700; pointer-events: none; }
+
+@media (min-width: 1400px) {
+  .gallery-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+}

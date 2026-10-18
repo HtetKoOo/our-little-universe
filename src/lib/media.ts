@@ -5,7 +5,7 @@ import type { UploadApiResponse } from "cloudinary";
 import { coupleMembers, couples, mediaAssets, memoryMedia } from "./db/schema";
 import { getCloudinary } from "./cloudinary";
 import { getDb } from "./db";
-import { PREVIEW_TRANSFORMATION } from "./direct-media-input";
+import { PREVIEW_TRANSFORMATION, THUMBNAIL_TRANSFORMATION } from "./direct-media-input";
 import { imageFormat, MAX_MEMORY_IMAGE_BYTES } from "./media-input";
 
 export type MediaActor = { coupleId: string; userId: string };
@@ -172,16 +172,28 @@ export async function uploadMemoryImage(actor: MediaActor, bytes: Uint8Array) {
 
 // Keep original files off Vercel's response path. Only a fixed-size private
 // derivative is proxied for display; originals use the download redirect.
-export function mediaPreviewUrl(asset: Pick<MediaAsset, "publicId" | "format">) {
-  const cloud = getCloudinary();
-  if (asset.publicId.startsWith("original_assets/")) {
-    return cloud.url(asset.publicId, {
-      secure: true, resource_type: "image", type: "authenticated", sign_url: true,
-      format: "jpg",
-      transformation: PREVIEW_TRANSFORMATION,
-    });
-  }
-  return cloud.utils.private_download_url(asset.publicId, asset.format, {
-    resource_type:"image",type:"authenticated",expires_at:Math.floor(Date.now()/1000)+60,attachment:false,
+export type MediaVariant = "thumbnail" | "preview";
+export function mediaPreviewUrl(asset: Pick<MediaAsset, "publicId" | "format">, variant: MediaVariant = "preview") {
+  return getCloudinary().url(asset.publicId, {
+    secure:true, resource_type:"image", type:"authenticated", sign_url:true,
+    format:"jpg", transformation: variant === "thumbnail" ? THUMBNAIL_TRANSFORMATION : PREVIEW_TRANSFORMATION,
   });
+}
+
+export async function fetchMediaPreview(asset: Pick<MediaAsset, "publicId" | "format">, variant: MediaVariant = "preview") {
+  const url = mediaPreviewUrl(asset,variant);
+  const load = () => fetch(url,{ cache:"no-store",redirect:"error",signal:AbortSignal.timeout(20000) });
+  let response = await load();
+  // Older assets lack these eager derivatives. Generate the fixed variant once;
+  // subsequent reads use Cloudinary's cached derivative, without another API call.
+  if ([400,401,403,404].includes(response.status)) {
+    await response.body?.cancel();
+    await getCloudinary().uploader.explicit(asset.publicId,{
+      resource_type:"image",type:"authenticated",
+      eager:[{ transformation: variant === "thumbnail" ? THUMBNAIL_TRANSFORMATION : PREVIEW_TRANSFORMATION, format:"jpg" }],
+      timeout:30000,
+    });
+    response = await load();
+  }
+  return response;
 }

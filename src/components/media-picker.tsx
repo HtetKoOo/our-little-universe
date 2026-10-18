@@ -63,7 +63,7 @@ export function MediaPicker({ assets: initialAssets, selectedIds = [], onUploadi
     <div className="media-selection-row">
       {selectedAssets.length ? <div className="media-selected-strip" aria-label={`${selectedAssets.length} selected photos`}>
         {selectedAssets.map((asset) => <button key={asset.id} className="media-selected-thumb" type="button" disabled={pending} onClick={() => toggle(asset.id)} aria-label="Remove selected photo">
-          <img src={`/api/media/${asset.id}`} alt="" loading="lazy" decoding="async" />
+          <img src={`/api/media/${asset.id}?size=thumbnail`} alt="" loading="lazy" decoding="async" />
           <span><X size={13} aria-hidden="true" /></span>
         </button>)}
       </div> : <p className="media-selection-empty">No photos selected yet.</p>}
@@ -92,7 +92,7 @@ export function MediaPicker({ assets: initialAssets, selectedIds = [], onUploadi
         {assets.map((asset) => {
           const isSelected = selected.includes(asset.id);
           return <button key={asset.id} type="button" className={isSelected ? "media-library-thumb selected" : "media-library-thumb"} onClick={() => toggle(asset.id)} disabled={pending} aria-pressed={isSelected}>
-            <img src={`/api/media/${asset.id}`} alt="" loading="lazy" decoding="async" />
+            <img src={`/api/media/${asset.id}?size=thumbnail`} alt="" loading="lazy" decoding="async" />
             {isSelected ? <span><Check size={17} strokeWidth={3} aria-hidden="true" /></span> : null}
           </button>;
         })}

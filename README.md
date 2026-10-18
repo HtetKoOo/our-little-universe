@@ -116,7 +116,7 @@ Gallery, Memory, and main-card photo uploads now request a signed permission,
 POST the file directly from the browser to Cloudinary, then send only an intent
 ID to the app to finalize it. Supported files are JPG, PNG and WebP, up to 8 MiB
 and 40 megapixels. The new flow preserves original bytes and generates a separate
-1600px JPEG preview for display. Original downloads go directly to Cloudinary;
+1280px JPEG preview and a 320px thumbnail for display. Original downloads go directly to Cloudinary;
 legacy, resized photos remain available at their existing quality.
 
 Finalization looks up the authenticated provider asset independently, checks
@@ -137,3 +137,10 @@ in maintenance if storage usage grows unexpectedly.
 After deployment, test a supported photo between 4.5 MB and 8 MiB from Memory and
 Gallery, download it and compare its checksum with the source, re-upload it from
 the other entry point, and verify that a different couple cannot access it.
+
+Gallery and photo pickers load low-quality 320px thumbnails; opening a photo loads
+only its 1280px preview. Original downloads are unchanged. Image responses use
+private browser caching with revalidation: each request rechecks membership before
+returning 304, avoiding another provider download when the cached image is current.
+Old photos generate the requested fixed derivative on first use; later requests
+reuse it. Thumbnail dimensions cap resolution; actual KB varies by image content.

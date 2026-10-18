@@ -1,4 +1,4 @@
-import { findMediaAsset, mediaPreviewUrl } from "@/lib/media";
+import { findMediaAsset, fetchMediaPreview } from "@/lib/media";
 import { z } from "zod";
 import { photoActor, publicIdFor } from "@/lib/heart-photo";
 import { getCloudinary } from "@/lib/cloudinary";
@@ -23,23 +23,11 @@ export async function GET(
     const photo = actor?.photos.find((item) => item.id === id);
     if (!actor || !photo) return new Response(null, { status: 404, headers });
     const asset = await findMediaAsset(actor, id);
-    const url = asset ? mediaPreviewUrl(asset) : getCloudinary().utils.private_download_url(
-      publicIdFor(id),
-      photo.format,
-      {
-        resource_type: "image",
-        type: "authenticated",
-        expires_at: Math.floor(Date.now() / 1000) + 60,
-        attachment: false,
-      },
+    const upstream = asset ? await fetchMediaPreview(asset) : await fetch(
+      getCloudinary().utils.private_download_url(publicIdFor(id),photo.format,{
+        resource_type:"image",type:"authenticated",expires_at:Math.floor(Date.now()/1000)+60,attachment:false,
+      }),{cache:"no-store",redirect:"error",signal:AbortSignal.timeout(15000)},
     );
-    // Never redirect to or expose the signed provider URL. Recheck membership on
-    // every application request, with no public CDN or browser cache.
-    const upstream = await fetch(url, {
-      cache: "no-store",
-      redirect: "error",
-      signal: AbortSignal.timeout(15000),
-    });
     const contentType = upstream.headers.get("content-type");
     if (
       !upstream.ok ||

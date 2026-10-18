@@ -5,7 +5,7 @@ import { getDb } from "./db";
 import { coupleMembers, couples, mediaAssets, mediaUploadIntents } from "./db/schema";
 import { getCloudinary } from "./cloudinary";
 import { findMediaByHash, type MediaActor } from "./media";
-import { directMediaInput, PREVIEW_TRANSFORMATION } from "./direct-media-input";
+import { directMediaInput, PREVIEW_TRANSFORMATION, THUMBNAIL_TRANSFORMATION } from "./direct-media-input";
 import { limitedBody, MAX_MEMORY_IMAGE_BYTES } from "./media-input";
 import { verifyResource, verifyOriginalBytes } from "./direct-media-validation";
 import type { z } from "zod";
@@ -37,7 +37,7 @@ export async function prepareDirectMedia(actor: MediaActor, input: z.infer<typeo
     type: "authenticated", overwrite: false,
     allowed_formats: "jpg,png,webp",
     // Eager preview creates a separate derivative; no incoming transformation.
-    eager: cloud.utils.generate_transformation_string({ transformation: PREVIEW_TRANSFORMATION }),
+    eager: [THUMBNAIL_TRANSFORMATION, PREVIEW_TRANSFORMATION].map(transformation => cloud.utils.generate_transformation_string({ transformation })).join("|"),
   };
   return {
     intentId: id,
