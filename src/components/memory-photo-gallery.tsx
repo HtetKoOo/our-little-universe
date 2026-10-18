@@ -15,7 +15,7 @@ function PrivatePhoto({ photo, className }: { photo: Photo; className: string })
   }, []);
   return <span className={`${className} memory-photo-${state}`}>
     <span className="memory-photo-shimmer" aria-hidden="true" />
-    {state === "failed" ? <span className="memory-photo-fallback" aria-hidden="true">♡</span> : <img ref={image} src={`/api/media/${photo.id}`} alt={photo.alt} loading="lazy" decoding="async" onLoad={() => setState("ready")} onError={() => setState("failed")} />}
+    {state === "failed" ? <span className="memory-photo-fallback" aria-hidden="true">♡</span> : <img ref={image} src={`/api/media/${photo.id}${className === "memory-photo-frame" ? "?size=thumbnail" : ""}`} alt={photo.alt} loading="lazy" decoding="async" onLoad={() => setState("ready")} onError={() => setState("failed")} />}
   </span>;
 }
 

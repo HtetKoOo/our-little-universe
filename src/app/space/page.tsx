@@ -43,7 +43,7 @@ export default async function Space() {
             : undefined
         }
         galleryPhotoSrcs={snapshot.galleryPhotoIds.map(
-          (id) => `/api/media/${id}`,
+          (id) => `/api/media/${id}?size=thumbnail`,
         )}
 
       />

@@ -9,6 +9,11 @@ export const directMediaInput = z.object({
 export const completeMediaInput = z.object({ intentId: z.uuid() });
 export const MAX_IMAGE_PIXELS = 40_000_000;
 export const PREVIEW_TRANSFORMATION = [
-  { width: 1600, height: 1600, crop: "limit" },
-  { fetch_format: "jpg", quality: 80 },
+  { width: 1280, height: 1280, crop: "limit" },
+  { fetch_format: "jpg", quality: 70 },
+];
+
+export const THUMBNAIL_TRANSFORMATION = [
+  { width: 320, height: 320, crop: "limit" },
+  { fetch_format: "jpg", quality: 60 },
 ];
