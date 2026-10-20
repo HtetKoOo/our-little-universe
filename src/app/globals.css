@@ -6286,3 +6286,9 @@ body:has(.memory-detail) .private-header {
 .memory-home-control button:disabled { opacity: .65; cursor: wait; }
 .memory-home-status { color: #806473; font-size: .8rem; line-height: 1.6; }
 .memory-home-status:empty { display: none; }
+.gallery-home-control { display: grid; justify-items: center; gap: 6px; flex-basis: 100%; }
+.gallery-home-control .button { display: inline-flex; align-items: center; gap: 8px; }
+.gallery-home-control small, .gallery-home-control p { color: #f6dbe6; font-size: .75rem; line-height: 1.5; text-align: center; }
+.gallery-home-control p:empty { display: none; }
+.home-photo-collage-count-1 .home-photo-collage-main { right: 0; }
+.home-photo-collage-count-2 .home-photo-collage-small { height: 100%; transform: none; }

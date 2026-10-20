@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { normalizeHomeWidgets } from "@/lib/home-widgets";
 import { notFound } from "next/navigation";
 import { z } from "zod";
 import { readHeartPhoto, preserveHeartPhotos } from "@/lib/heart-photo";
@@ -16,11 +17,12 @@ export default async function GalleryPage({ searchParams }: {
 }) {
   const couple = await requireCouple();
   const query = await searchParams;
+  const homePhotoIds = normalizeHomeWidgets(couple.homeWidgets).find(widget => widget.id === "photo")?.photoIds ?? [];
   if (query.album) {
     if (!z.uuid().safeParse(query.album).success) notFound();
     const album = await findGalleryAlbum(couple, query.album);
     if (!album) notFound();
-    return <SharedGallery key={album.id} uploadsEnabled={false} initialAssets={album.photos}
+    return <SharedGallery homePhotoIds={homePhotoIds} key={album.id} uploadsEnabled={false} initialAssets={album.photos}
       album={{ id: album.id, title: album.title }} />;
   }
   if (query.view === "albums") {
@@ -41,5 +43,5 @@ export default async function GalleryPage({ searchParams }: {
   await preserveHeartPhotos(couple, heart.photos ?? []);
   const favoritesOnly = query.view === "favorites";
   const assets = await listMediaAssets(couple, favoritesOnly);
-  return <SharedGallery key={favoritesOnly ? "favorites" : "photos"} favoritesOnly={favoritesOnly} uploadsEnabled={!favoritesOnly && mediaConfigured()} initialAssets={assets.map(({ id, width, height, createdAt, isFavorite }) => ({ id, width, height, createdAt, isFavorite }))} />;
+  return <SharedGallery homePhotoIds={homePhotoIds} key={favoritesOnly ? "favorites" : "photos"} favoritesOnly={favoritesOnly} uploadsEnabled={!favoritesOnly && mediaConfigured()} initialAssets={assets.map(({ id, width, height, createdAt, isFavorite }) => ({ id, width, height, createdAt, isFavorite }))} />;
 }

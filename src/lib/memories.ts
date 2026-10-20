@@ -116,12 +116,16 @@ export async function homeMemorySnapshot() {
     .where(eq(mediaAssets.coupleId, actor.coupleId))
     .orderBy(desc(mediaAssets.createdAt))
     .limit(3);
+  const chosenIds = normalizeHomeWidgets(actor.homeWidgets).find(widget => widget.id === "photo")?.photoIds ?? [];
+  const chosenPhotos = chosenIds.length ? await db.select({ id: mediaAssets.id }).from(mediaAssets)
+    .where(and(eq(mediaAssets.coupleId, actor.coupleId), eq(mediaAssets.resourceType, "image"), inArray(mediaAssets.id, chosenIds))) : [];
+  const orderedChosen = chosenIds.filter(id => chosenPhotos.some(photo => photo.id === id));
   return {
     featured: featured ?? null,
     latest: latest ?? null,
     milestone: milestone ?? null,
     total: total?.value ?? 0,
     favoriteCoverId: favoriteCover?.assetId ?? null,
-    galleryPhotoIds: galleryPhotos.map(({ id }) => id),
+    galleryPhotoIds: orderedChosen.length ? orderedChosen : galleryPhotos.map(({ id }) => id),
   };
 }

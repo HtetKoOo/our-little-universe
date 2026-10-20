@@ -8,6 +8,7 @@ export type HomeWidgetConfig = {
   visible: boolean;
   size: HomeWidgetSize;
   memoryId?: string | null;
+  photoIds?: string[];
 };
 
 export const defaultHomeWidgets: HomeWidgetConfig[] = [
@@ -22,7 +23,8 @@ const widgetConfigInput = z.object({
   visible: z.boolean(),
   size: z.enum(["half", "full"]),
   memoryId: z.uuid().nullable().optional(),
-}).refine(widget => widget.id === "memory" || widget.memoryId == null, { message: "Only the memory widget can select a memory." });
+  photoIds: z.array(z.uuid()).max(3).refine(ids => new Set(ids).size === ids.length).optional(),
+}).refine(widget => widget.id === "memory" || widget.memoryId == null, { message: "Only the memory widget can select a memory." }).refine(widget => widget.id === "photo" || !widget.photoIds?.length, { message: "Only the gallery widget can select photos." });
 
 export function normalizeHomeWidgets(value: unknown): HomeWidgetConfig[] {
   const parsed = z.array(widgetConfigInput).safeParse(value);
@@ -39,5 +41,11 @@ export const homeWidgetsInput = z.array(widgetConfigInput).length(homeWidgetIds.
 export function withHomeMemory(config: HomeWidgetConfig[], memoryId: string | null): HomeWidgetConfig[] {
   return config.map(widget => widget.id === "memory"
     ? { ...widget, memoryId, ...(memoryId ? { visible: true } : {}) }
+    : widget);
+}
+
+export function withHomePhotos(config: HomeWidgetConfig[], photoIds: string[]): HomeWidgetConfig[] {
+  return config.map(widget => widget.id === "photo"
+    ? { ...widget, photoIds, ...(photoIds.length ? { visible: true } : {}) }
     : widget);
 }

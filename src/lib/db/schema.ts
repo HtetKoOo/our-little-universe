@@ -107,6 +107,7 @@ export const couples = pgTable("couples", {
     visible: boolean;
     size: "half" | "full";
     memoryId?: string | null;
+    photoIds?: string[];
   }[]>(),
   homeWidgetsRevision: integer("home_widgets_revision").default(0).notNull(),
   id: uuid("id").defaultRandom().primaryKey(),

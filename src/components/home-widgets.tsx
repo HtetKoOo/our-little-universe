@@ -46,7 +46,7 @@ export function HomeWidgets({ config, latest, milestone, featured = null, memory
     const full = item.size === "full";
     const className = `home-widget home-widget-${item.id} home-widget-${item.size}${item.id === "memory" && full && favoriteCoverSrc ? " home-widget-memory-with-cover" : ""}`;
     if (item.id === "photo") return <Link className={className} href="/space/gallery" onClick={(event) => editing && event.preventDefault()}>
-      {photoSources.length ? full ? <div className="home-photo-collage" aria-hidden="true"><GalleryPhoto className="home-photo-collage-main" src={photoSources[0]!} />{photoSources.slice(1, 3).map((src, index) => <GalleryPhoto className={`home-photo-collage-small home-photo-collage-small-${index}`} src={src} key={src} />)}</div> : <GalleryPhoto className="home-photo-single" src={photoSources[0]!} /> : <span className="home-photo-placeholder" aria-hidden="true">♡</span>}
+      {photoSources.length ? full ? <div className={`home-photo-collage home-photo-collage-count-${photoSources.length}`} aria-hidden="true"><GalleryPhoto className="home-photo-collage-main" src={photoSources[0]!} />{photoSources.slice(1, 3).map((src, index) => <GalleryPhoto className={`home-photo-collage-small home-photo-collage-small-${index}`} src={src} key={src} />)}</div> : <GalleryPhoto className="home-photo-single" src={photoSources[0]!} /> : <span className="home-photo-placeholder" aria-hidden="true">♡</span>}
       <div className="home-widget-copy"><p>OUR PHOTOS</p>{full && <h3>A little us, lately.</h3>}</div>
       <small><b>{photoSources.length ? "Open gallery →" : "Add our first photo →"}</b></small>
     </Link>;
