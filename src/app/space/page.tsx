@@ -33,6 +33,8 @@ export default async function Space() {
       />
       <PartnerPresence />
       <HomeWidgets
+        key={couple.homeWidgetsRevision}
+        featured={snapshot.featured}
         config={normalizeHomeWidgets(couple.homeWidgets)}
         latest={snapshot.latest}
         milestone={snapshot.milestone}

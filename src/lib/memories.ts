@@ -1,4 +1,5 @@
 import "server-only";
+import { normalizeHomeWidgets } from "./home-widgets";
 import { and, count, desc, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { requireCouple } from "./authorization";
@@ -92,7 +93,9 @@ export async function homeMemorySnapshot() {
     .select({ value: count() })
     .from(memories)
     .where(memoryScope(actor));
-  const favorite = milestone ?? latest;
+  const selectedId = normalizeHomeWidgets(actor.homeWidgets).find(widget => widget.id === "memory")?.memoryId;
+  const [featured] = selectedId ? await db.select().from(memories).where(memoryScope(actor, selectedId)).limit(1) : [];
+  const favorite = featured ?? milestone ?? latest;
   const [favoriteCover] = favorite
     ? await db
         .select({ assetId: mediaAssets.id })
@@ -114,6 +117,7 @@ export async function homeMemorySnapshot() {
     .orderBy(desc(mediaAssets.createdAt))
     .limit(3);
   return {
+    featured: featured ?? null,
     latest: latest ?? null,
     milestone: milestone ?? null,
     total: total?.value ?? 0,

@@ -4,6 +4,7 @@
 import { uploadPhotoBatch, type FailedPhotoUpload, type UploadProgress } from "@/lib/media-upload-queue";
 import { MAX_MEMORY_MEDIA, MAX_MEMORY_UPLOAD_BATCH, MAX_MEMORY_IMAGE_BYTES } from "@/lib/media-input";
 import { useRef, useState } from "react";
+import { setMemoryCover } from "@/lib/memory-cover";
 import { Check, ImagePlus, LoaderCircle, X } from "lucide-react";
 
 export type LibraryAsset = { id: string; format: string; width: number | null; height: number | null };
@@ -59,13 +60,20 @@ export function MediaPicker({ assets: initialAssets, selectedIds = [], onUploadi
   return <fieldset className="media-picker" aria-busy={pending}>
     <legend>Photos <span>(optional)</span></legend>
     <p className="media-help">Choose photos already saved together, or add a new one. Each photo is stored only once.</p>
+    {selected.length > 0 && <p className="media-cover-help">Choose a cover for the memory card, album and Home preview. Save the memory to keep your choice.</p>}
     <input type="file" multiple disabled={pending} ref={input} className="file-input" accept="image/jpeg,image/png,image/webp" onChange={(event) => { void upload(Array.from(event.target.files ?? [])); event.target.value = ""; }} />
     <div className="media-selection-row">
       {selectedAssets.length ? <div className="media-selected-strip" aria-label={`${selectedAssets.length} selected photos`}>
-        {selectedAssets.map((asset) => <button key={asset.id} className="media-selected-thumb" type="button" disabled={pending} onClick={() => toggle(asset.id)} aria-label="Remove selected photo">
-          <img src={`/api/media/${asset.id}?size=thumbnail`} alt="" loading="lazy" decoding="async" />
-          <span><X size={13} aria-hidden="true" /></span>
-        </button>)}
+        {selectedAssets.map((asset, index) => <div key={asset.id} className="media-selected-photo">
+          <button className="media-selected-thumb media-cover-choice" type="button" disabled={pending}
+            onClick={() => setSelected(current => setMemoryCover(current, asset.id))}
+            aria-pressed={index === 0} aria-label={index === 0 ? "Current memory cover" : `Set photo ${index + 1} as cover`}>
+            <img src={`/api/media/${asset.id}?size=thumbnail`} alt="" loading="lazy" decoding="async" />
+          </button>
+          <button type="button" className="media-cover-label" disabled={pending} aria-pressed={index === 0}
+            onClick={() => setSelected(current => setMemoryCover(current, asset.id))}>{index === 0 ? "✓ Cover" : "Set as cover"}</button>
+          <button type="button" className="media-selected-remove" disabled={pending} onClick={() => toggle(asset.id)} aria-label={`Remove photo ${index + 1}${index === 0 ? ", current cover" : ""}`}><X size={13} aria-hidden="true" /></button>
+        </div>)}
       </div> : <p className="media-selection-empty">No photos selected yet.</p>}
       <button className="media-add-button" type="button" onClick={() => dialog.current?.showModal()}>
         <ImagePlus size={18} aria-hidden="true" /> Add photos

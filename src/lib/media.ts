@@ -21,11 +21,11 @@ export function mediaConfigured() {
   );
 }
 
-export async function listMediaAssets(actor: MediaActor) {
+export async function listMediaAssets(actor: MediaActor, favoritesOnly = false) {
   return getDb()
     .select()
     .from(mediaAssets)
-    .where(eq(mediaAssets.coupleId, actor.coupleId))
+    .where(and(eq(mediaAssets.coupleId, actor.coupleId), favoritesOnly ? eq(mediaAssets.isFavorite, true) : undefined))
     .orderBy(desc(mediaAssets.createdAt))
     .limit(60);
 }

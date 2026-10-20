@@ -138,6 +138,10 @@ After deployment, test a supported photo between 4.5 MB and 8 MiB from Memory an
 Gallery, download it and compare its checksum with the source, re-upload it from
 the other entry point, and verify that a different couple cannot access it.
 
+Memory photos support **Set as cover** in the create/edit form; save the memory to use that photo on its card, album and Home preview. Open a memory and tap **Show on Home** to feature it for both partners. The selected memory shows **Shown on Home** and **Use automatic selection**. Automatic selection uses the latest milestone, falling back to the latest memory. Deleted selections also fall back automatically. These choices reuse existing photo positions and Home settings, so they need no additional migration.
+
+Gallery has Photos, Albums, and Favorites views. Open a photo and use the heart to add or remove it from the couple’s shared Favorites. Before deploying this update, run `pnpm db:migrate` to apply migration 0017, which adds the favorite flag. Each memory with photos automatically becomes an album, using its first photo as the cover. Albums show the memory date and photo count; opening one loads its attached photos in order. Edit the memory to manage its album. Removing a memory does not remove its photos from the shared library. Albums reuse existing attachments without duplicating files.
+
 Gallery and photo pickers load low-quality 320px thumbnails; opening a photo loads
 only its 1280px preview. Original downloads are unchanged. Image responses use
 private browser caching with revalidation: each request rechecks membership before

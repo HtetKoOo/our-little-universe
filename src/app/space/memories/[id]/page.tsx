@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { normalizeHomeWidgets } from "@/lib/home-widgets";
+import { MemoryHomeControl } from "@/components/memory-home-control";
 import { ArrowLeft, MapPin, Pencil } from "lucide-react";
 import { notFound } from "next/navigation";
 import { findMemory } from "@/lib/memories";
@@ -66,6 +68,8 @@ export default async function MemoryPage({
         />
         <footer className="memory-letter-footer">
           <p>Kept together, for whenever you want to come back to it.</p>
+          <MemoryHomeControl key={couple.homeWidgetsRevision} memoryId={memory.id}
+            selected={normalizeHomeWidgets(couple.homeWidgets).find(widget => widget.id === "memory")?.memoryId === memory.id} />
           <Link
             className="memory-edit-link"
             href={`/space/memories/${memory.id}/edit`}
