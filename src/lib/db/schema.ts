@@ -106,6 +106,8 @@ export const couples = pgTable("couples", {
     id: "photo" | "jar" | "question" | "memory";
     visible: boolean;
     size: "half" | "full";
+    memoryId?: string | null;
+    photoIds?: string[];
   }[]>(),
   homeWidgetsRevision: integer("home_widgets_revision").default(0).notNull(),
   id: uuid("id").defaultRandom().primaryKey(),
@@ -198,6 +200,7 @@ export const mediaAssets = pgTable(
     height: integer("height"),
     durationMs: integer("duration_ms"),
     contentHash: text("content_hash"),
+    isFavorite: boolean("is_favorite").default(false).notNull(),
     createdAt: createdAt(),
   },
   (t) => [

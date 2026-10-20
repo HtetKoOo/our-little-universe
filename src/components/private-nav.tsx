@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Heart, House, MessageCircleHeart, MoreHorizontal, NotebookText } from "lucide-react";
+import { Heart, House, Images, MessageCircleHeart, MoreHorizontal, NotebookText } from "lucide-react";
 export function PrivateNav() {
   const path = usePathname();
   const [questionAttention, setQuestionAttention] = useState(false);
@@ -33,6 +33,7 @@ export function PrivateNav() {
       {[
         { href: "/space", text: "Home", Icon: House },
         { href: "/space/memories", text: "Memories", Icon: Heart },
+        { href: "/space/gallery", text: "Gallery", Icon: Images },
         { href: "/space/questions", text: "Question", Icon: MessageCircleHeart },
         { href: "/space/notes", text: "Notes", Icon: NotebookText },
         { href: "/space/more", text: "More", Icon: MoreHorizontal },
@@ -43,6 +44,7 @@ export function PrivateNav() {
             : path === href || path.startsWith(`${href}/`);
         return (
           <Link
+            className={href === "/space/gallery" ? "private-nav-gallery" : undefined}
             key={href}
             href={href}
             prefetch={true}
