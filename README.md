@@ -142,6 +142,10 @@ Memory photos support **Set as cover** in the create/edit form; save the memory 
 
 Open a Gallery photo and tap **Show on Home** to choose up to three photos for the shared Gallery widget. The first selected photo is the main image (and the one shown in half-width mode). **Remove from Home** removes that selection without deleting the photo. With no selected photos, Home uses the latest Gallery photos automatically. This uses existing Home settings and needs no new database migration.
 
+**More → Our space → Photo storage** shows the shared library photo count and total stored file bytes. Reused photos count once. This is an app library total, excluding Cloudinary derived previews, abandoned uploads, bandwidth and other account assets. The owner can open the Cloudinary console for full account usage; the app does not call Cloudinary usage APIs to render this indicator.
+
+Gallery Photos and Favorites load 60 photos at a time with **Load more photos** for older images. The viewer supports **Previous / Next** and keyboard arrow keys; Next at the end of a loaded page fetches the next page. Albums use the same viewer navigation. Only the current photo loads its larger preview.
+
 Gallery has Photos, Albums, and Favorites views. Open a photo and use the heart to add or remove it from the couple’s shared Favorites. Before deploying this update, run `pnpm db:migrate` to apply migration 0017, which adds the favorite flag. Each memory with photos automatically becomes an album, using its first photo as the cover. Albums show the memory date and photo count; opening one loads its attached photos in order. Edit the memory to manage its album. Removing a memory does not remove its photos from the shared library. Albums reuse existing attachments without duplicating files.
 
 Gallery and photo pickers load low-quality 320px thumbnails; opening a photo loads

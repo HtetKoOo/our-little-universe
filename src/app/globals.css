@@ -6292,3 +6292,15 @@ body:has(.memory-detail) .private-header {
 .gallery-home-control p:empty { display: none; }
 .home-photo-collage-count-1 .home-photo-collage-main { right: 0; }
 .home-photo-collage-count-2 .home-photo-collage-small { height: 100%; transform: none; }
+.gallery-load-more { display: flex; justify-content: center; margin-top: 24px; }
+.gallery-viewer-toolbar { justify-content: space-between; }
+.gallery-viewer-navigation { display: flex; align-items: center; gap: 10px; color: #f6dbe6; }
+.gallery-viewer-navigation > span { min-width: 65px; text-align: center; font-size: .8rem; }
+.gallery-viewer-close:disabled { opacity: .4; cursor: default; }
+.storage-usage h2 { display: flex; align-items: center; gap: 9px; }
+.storage-usage-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 18px 0; }
+.storage-usage-stats > div { min-width: 0; padding: 16px; border: 1px solid #efcfdd; border-radius: 16px; background: #fffafc; }
+.storage-usage-stats dt { color: #806473; font-size: .8rem; }
+.storage-usage-stats dd { margin: 8px 0 0; color: #943456; font-size: clamp(1.2rem, 4vw, 1.8rem); font-weight: 700; overflow-wrap: anywhere; }
+.storage-usage-note { color: #806473; font-size: .84rem; line-height: 1.7; }
+.storage-dashboard-link { display: inline-flex; align-items: center; gap: 7px; color: #943456; font-size: .85rem; text-decoration: underline; text-underline-offset: 3px; }
