@@ -3,7 +3,8 @@
 import { useEffect } from "react";
 
 function sendHeartbeat() {
-  void fetch("/api/presence", { method: "POST", cache: "no-store", keepalive: true });
+  if (document.visibilityState !== "visible" || !navigator.onLine) return;
+  void fetch("/api/presence", { method: "POST", cache: "no-store", keepalive: true }).catch(() => { /* Retry at the next heartbeat when connectivity returns. */ });
 }
 
 export function PresenceHeartbeat() {

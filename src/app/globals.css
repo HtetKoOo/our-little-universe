@@ -6310,3 +6310,10 @@ body:has(.memory-detail) .private-header {
 .pwa-update button { min-height: 44px; padding: 10px 14px; border: 1px solid #e5afc6; border-radius: 12px; background: #fbe3ed; color: #943456; font: inherit; font-size: .8rem; font-weight: 700; cursor: pointer; }
 .pwa-update button:disabled { opacity: .6; cursor: wait; }
 @media (max-width: 600px) { .pwa-update { bottom: calc(112px + env(safe-area-inset-bottom)); } }
+
+/* Pending navigation feedback reserves no extra label width. */
+.private-nav a, .gallery-navigation a { position: relative; }
+.navigation-feedback { position: absolute; bottom: 4px; left: 30%; right: 30%; height: 3px; border-radius: 99px; background: currentColor; opacity: 0; pointer-events: none; }
+.navigation-feedback.is-pending { opacity: .55; }
+.section-loading { display: grid; gap: 24px; }
+.section-loading .loading-card { display: grid; align-content: start; gap: 20px; min-height: 180px; padding: 24px; }

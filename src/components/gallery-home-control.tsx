@@ -8,12 +8,16 @@ export function GalleryHomeControl({ id, photoIds, onChange }: { id: string; pho
   const [message, setMessage] = useState("");
   const selected = photoIds.includes(id);
   function update() {
+    if (!selected && photoIds.length >= 3) { setMessage("Choose up to 3 Home photos. Remove one first."); return; }
+    const previous = photoIds;
+    onChange(selected ? photoIds.filter(photoId => photoId !== id) : [...photoIds, id]);
     startTransition(async () => {
       try {
         const result = await setHomeGalleryPhoto(id, !selected);
         setMessage(result.message);
         if (result.success && result.photoIds) onChange(result.photoIds);
-      } catch { setMessage("Couldn’t update Home. Please try again."); }
+        else onChange(previous);
+      } catch { onChange(previous); setMessage("Couldn’t update Home. Please try again."); }
     });
   }
   return <div className="gallery-home-control">

@@ -11,12 +11,16 @@ export function MemoryHomeControl({ memoryId, selected }: { memoryId: string; se
   const [shown, setShown] = useState(selected);
   const [pending, startTransition] = useTransition();
   function update(show: boolean) {
+    const previous = shown;
+    setShown(show);
     startTransition(async () => {
       try {
         const result = await setHomeMemory(memoryId, show);
         setMessage(result.message);
-        if (result.success) { setShown(show); router.refresh(); }
+        if (result.success) { router.refresh(); }
+        else setShown(previous);
       } catch {
+        setShown(previous);
         setMessage("Couldn’t update Home. Please try again.");
       }
     });

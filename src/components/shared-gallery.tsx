@@ -61,13 +61,17 @@ export function SharedGallery({ initialAssets, uploadsEnabled, album, favoritesO
   async function toggleFavorite() {
     if (!active || favoriteRequest.current) return;
     const id = active.id;
+    const previous = Boolean(active.isFavorite);
+    const optimistic = !previous;
+    setActive(current => current?.id === id ? { ...current, isFavorite: optimistic } : current);
+    setAssets(current => current.map(photo => photo.id === id ? { ...photo, isFavorite: optimistic } : photo));
     favoriteRequest.current = true;
     setSavingFavorite(true);
     setMessage("");
     try {
       const response = await fetch(`/api/media/${id}/favorite`, {
         method: "PUT", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ isFavorite: !active.isFavorite }),
+        body: JSON.stringify({ isFavorite: optimistic }), signal: AbortSignal.timeout(15000),
       });
       if (!response.ok) throw new Error("Couldn’t update favorite. Please try again.");
       const result: { isFavorite: boolean } = await response.json();
@@ -78,6 +82,8 @@ export function SharedGallery({ initialAssets, uploadsEnabled, album, favoritesO
       if (favoritesOnly && !result.isFavorite) viewer.current?.close();
       setMessage(result.isFavorite ? "Added to our favorites." : "Removed from our favorites.");
     } catch {
+      setActive(current => current?.id === id ? { ...current, isFavorite: previous } : current);
+      setAssets(current => current.map(photo => photo.id === id ? { ...photo, isFavorite: previous } : photo));
       setMessage("Couldn’t update favorite. Please try again.");
     } finally {
       favoriteRequest.current = false;
