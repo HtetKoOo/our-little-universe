@@ -6329,3 +6329,18 @@ body:has(.memory-detail) .private-header {
 .demo-v2-memory-cover > img { position: absolute; inset: 0; }
 .demo-v2-memory-cover .cover-label { max-width: calc(100% - 24px); font-size: .8rem; }
 .demo-gallery-navigation + .gallery-album-grid .gallery-album { font-family: inherit; text-align: left; cursor: pointer; }
+.pwa-install h2, .pwa-installed { display: flex; align-items: center; gap: 9px; }
+.pwa-install p, .pwa-install li { color: #806473; font-size: .85rem; line-height: 1.7; }
+.pwa-install .button { display: inline-flex; align-items: center; gap: 8px; margin: 8px 0; }
+.pwa-install details { margin: 16px 0; padding: 14px; border: 1px solid #efcfdd; border-radius: 14px; background: #fffafc; }
+.pwa-install summary { color: #943456; font-size: .9rem; font-weight: 700; cursor: pointer; }
+.pwa-install ul { padding-left: 20px; }
+.pwa-install li + li { margin-top: 10px; }
+.pwa-install [role="status"]:empty { display: none; }
+.pwa-update { position: fixed; z-index: 1000; left: 50%; bottom: max(24px, env(safe-area-inset-bottom)); transform: translateX(-50%); width: min(520px, calc(100% - 28px)); display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 18px; border: 1px solid #e5afc6; border-radius: 20px; background: #fffafc; color: #542d40; box-shadow: 0 8px 36px #542d4030; }
+.pwa-update > div { flex: 1 1 200px; }
+.pwa-update strong { font-size: .9rem; }
+.pwa-update p { margin: 5px 0 0; font-size: .8rem; color: #806473; }
+.pwa-update button { min-height: 44px; padding: 10px 14px; border: 1px solid #e5afc6; border-radius: 12px; background: #fbe3ed; color: #943456; font: inherit; font-size: .8rem; font-weight: 700; cursor: pointer; }
+.pwa-update button:disabled { opacity: .6; cursor: wait; }
+@media (max-width: 600px) { .pwa-update { bottom: calc(112px + env(safe-area-inset-bottom)); } }

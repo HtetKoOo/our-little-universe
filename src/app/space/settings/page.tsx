@@ -1,3 +1,4 @@
+import { PwaInstall } from "@/components/pwa-install";
 import { StorageUsage } from "@/components/storage-usage";
 import { requireCouple } from "@/lib/authorization";
 import { BirthdayForm, CoupleForm } from "@/components/memory-form";
@@ -52,6 +53,7 @@ export default async function Settings() {
     <section className="private-account"><h2>Your birthday</h2><BirthdayForm birthday={me?.birthday ?? null} /></section>
     {couple.role === "owner" ? <PartnerInvite partner={partner ?? null} /> : null}
     {showCelebrationResend ? <CelebrationResend /> : null}
+    <PwaInstall />
     <StorageUsage />
     {couple.role === "owner" ? <StartFresh /> : null}
     <section className="private-account"><h2>Your account</h2><SignOut /></section>

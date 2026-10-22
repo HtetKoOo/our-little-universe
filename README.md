@@ -158,3 +158,17 @@ reuse it. Thumbnail dimensions cap resolution; actual KB varies by image content
 ### V2 interactive demo
 
 The public `/demo` uses fictional artwork and 66 sample photos. Reviewers can try Photos / Albums / Favorites, Load more, viewer navigation, memory covers, and Show on Home for memories and up to three Gallery photos. Changes stay in this tab using session storage; **More → Reset preview choices** restores the sample state. More also shows clearly labelled illustrative storage totals. Demo actions never call private media or account mutation endpoints, and no personal uploads are accepted.
+
+### V2 PWA
+
+The app has a standalone web manifest, 192/512px icons, a maskable icon and an Apple Home Screen icon. Launching the installed app opens `/space` and uses the existing account/session checks.
+
+**More → Our space → Keep us on your Home Screen** has installation instructions and an Install button when the browser supplies an installation prompt. On iPhone/iPad, open in Safari and use **Share → Add to Home Screen → Add**. Availability and menu wording depend on the browser/device.
+
+The service worker registers only in production on HTTPS (or a trusted localhost). It caches only `/offline.html`, `/pwa/offline.css`, and `/pwa/offline.js`. Private pages, API responses, RSC requests, photo files and authentication data are never written to its cache. A failed full-page navigation shows a public offline screen with Retry; an open app shows a connectivity notice. Online use is required for app content. Existing private browser photo-cache behavior is unchanged.
+
+A new build changes the worker version automatically. A waiting update displays **Refresh app / Later**; only the tab whose user chooses Refresh reloads. Save drafts first. There is no automatic reload, offline mutation queue, offline photo library, or push notification feature in this release. Backgrounding all tabs or closing the app can also allow normal browser worker activation.
+
+Verify PWA behavior with `pnpm build` then `pnpm start` (use a separate localhost port when a development server is running). The worker is disabled during `pnpm dev`. In browser developer tools, check the manifest/icons, root worker scope, and that its cache contains only the three public files. Test a full-page reload offline, Retry after reconnecting, installation on iPhone/Android, and a second deployment while an existing app tab remains open. Installation testing does not require sending emails or changing account data.
+
+Browser API references: [installation prompt](https://developer.mozilla.org/en-US/docs/Web/API/BeforeInstallPromptEvent), [waiting worker activation](https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerGlobalScope/skipWaiting).
