@@ -24,6 +24,7 @@ export function PartnerPresence() {
   useEffect(() => {
     let cancelled = false;
     const refresh = async () => {
+      if (document.visibilityState !== "visible" || !navigator.onLine) return;
       try {
         const response = await fetch("/api/presence", { cache: "no-store" });
         if (!response.ok || cancelled) return;
@@ -35,9 +36,11 @@ export function PartnerPresence() {
     };
     void refresh();
     const interval = window.setInterval(refresh, 60_000);
+    document.addEventListener("visibilitychange", refresh);
     return () => {
       cancelled = true;
       window.clearInterval(interval);
+      document.removeEventListener("visibilitychange", refresh);
     };
   }, []);
 

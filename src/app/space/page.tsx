@@ -12,8 +12,8 @@ export default async function Space() {
   const couple = await requireCouple();
   const heart = await readHeartPhoto(couple);
   await preserveHeartPhotos(couple, heart.photos ?? []);
-  const library = await listMediaAssets(couple);
-  const snapshot = await homeMemorySnapshot();
+
+  const [library, snapshot] = await Promise.all([listMediaAssets(couple), homeMemorySnapshot()]);
 
   return (
     <section className="space-home">

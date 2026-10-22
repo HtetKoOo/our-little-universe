@@ -2,7 +2,11 @@
 import { useActionState, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { LibraryAsset } from "./media-picker";
-import { HeartPhotoEditor } from "./heart-photo-editor";
+import dynamic from "next/dynamic";
+
+const HeartPhotoEditor = dynamic(() => import("./heart-photo-editor").then(module => module.HeartPhotoEditor), {
+  loading: () => <p role="status">Opening photo editor…</p>,
+});
 import type { SavedHeartPhoto } from "@/lib/heart-photo-input";
 import { Pencil } from "lucide-react";
 import { CoupleMainCard } from "./couple-main-card";

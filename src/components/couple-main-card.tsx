@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useState, type ReactNode } from "react";
+import { preload } from "react-dom";
 import { photoGeometry, type HeartCrop } from "@/lib/heart-photo-input";
 import { defaultCardText, type CardText } from "@/lib/card-text";
 import styles from "./couple-main-card.module.css";
@@ -42,6 +43,8 @@ export function CoupleMainCard({
     .filter((photo) => !failed.includes(photo.src));
   const active = index % Math.max(available.length, 1);
   const playing = !paused && !reducedMotion && visible && available.length > 1;
+  // Prioritize only the first visible heart photo; other slides keep normal priority.
+  if (photos[0]?.src) preload(photos[0].src, { as: "image", fetchPriority: "high" });
   const stats = anniversaryStats(togetherSince, today);
   const since = new Intl.DateTimeFormat("en", {
     month: "short",

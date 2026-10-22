@@ -172,3 +172,16 @@ A new build changes the worker version automatically. A waiting update displays 
 Verify PWA behavior with `pnpm build` then `pnpm start` (use a separate localhost port when a development server is running). The worker is disabled during `pnpm dev`. In browser developer tools, check the manifest/icons, root worker scope, and that its cache contains only the three public files. Test a full-page reload offline, Retry after reconnecting, installation on iPhone/Android, and a second deployment while an existing app tab remains open. Installation testing does not require sending emails or changing account data.
 
 Browser API references: [installation prompt](https://developer.mozilla.org/en-US/docs/Web/API/BeforeInstallPromptEvent), [waiting worker activation](https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerGlobalScope/skipWaiting).
+
+### Development-only test content cleanup
+
+The real app no longer exposes **Start our story fresh**, its reset Server Action, or cleanup-code emails. **Reset preview choices** remains available in the fictional demo and only resets that tab’s sample choices.
+
+If development fixtures need clearing, use the local-only CLI:
+
+1. Create a separate, disposable test database/Neon branch with a different endpoint from the application's database and apply migrations there. Stop apps/workers using that test database before applying cleanup.
+2. Set `CLEANUP_TEST_DATABASE_URL` to that test connection in your local shell. Keep credentials out of commits and shell history. The CLI never uses `DATABASE_URL` as a fallback and refuses the app’s configured endpoint, including pooled/unpooled variants.
+3. Run `pnpm dev:clear-test-data --couple <test-couple-uuid>` for a read-only count/preview.
+4. Only for disposable fixtures, rerun with `--apply` and type the exact displayed confirmation phrase in the interactive terminal.
+
+The command refuses production, Vercel and CI execution. It clears one explicit test couple’s memories, media attachment/asset records, upload intents, heart photo references and question rounds/progress in one database transaction; Home photo/memory selections are cleared as well. Accounts, couple details, letters, jar notes and the question bank remain. It does **not** delete Cloudinary files or use Cloudinary credentials, so it cannot purge shared production photo storage. Use a separate test Cloudinary environment for upload fixtures. The CLI is never imported by the web app. No database cleanup is performed as part of installing or deploying this change.

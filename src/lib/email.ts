@@ -39,19 +39,6 @@ export async function sendEmailVerification({ to, name, url }: { to: string; nam
   if (error) throw new Error("Email verification could not be sent");
 }
 
-export async function sendCleanupCode({ to, code }: { to: string; code: string }) {
-  if (!emailConfigured()) throw new Error("Email delivery is not configured");
-  const resend = new Resend(process.env.RESEND_API_KEY!);
-  const { error } = await resend.emails.send({
-    from: process.env.EMAIL_FROM!,
-    to,
-    subject: "Your Our Little Universe cleanup code",
-    text: `Your confirmation code is ${code}. It expires in 10 minutes. Do not share it with anyone.`,
-    html: `<main style="font-family:Arial,sans-serif;color:#4b2c3d;line-height:1.6"><h1 style="font-family:Georgia,serif">One careful step.</h1><p>Your test-data cleanup code is:</p><p style="font-size:28px;font-weight:700;letter-spacing:5px">${code}</p><p>It expires in 10 minutes. Do not share it with anyone.</p></main>`,
-  });
-  if (error) throw new Error("Cleanup code could not be sent");
-}
-
 export async function sendLittleQuestionReminder({ to }: { to: string }) {
   if (!emailConfigured()) throw new Error("Email delivery is not configured");
   const origin = process.env.BETTER_AUTH_URL;
