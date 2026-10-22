@@ -4,7 +4,6 @@ import { requireCouple } from "@/lib/authorization";
 import { BirthdayForm, CoupleForm } from "@/components/memory-form";
 import { SignOut } from "@/components/sign-out";
 import { PartnerInvite } from "@/components/partner-invite";
-import { StartFresh } from "@/components/start-fresh";
 import { CelebrationResend } from "@/components/celebration-resend";
 import { getDb } from "@/lib/db";
 import { coupleEventEmails, coupleMembers, user } from "@/lib/db/schema";
@@ -55,7 +54,6 @@ export default async function Settings() {
     {showCelebrationResend ? <CelebrationResend /> : null}
     <PwaInstall />
     <StorageUsage />
-    {couple.role === "owner" ? <StartFresh /> : null}
     <section className="private-account"><h2>Your account</h2><SignOut /></section>
   </>;
 }

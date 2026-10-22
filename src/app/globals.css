@@ -3223,40 +3223,6 @@ body:has(.memory-detail) .private-header {
 .invite-signed-in form .button {
   margin-top: 4px;
 }
-.start-fresh {
-  display: grid;
-  gap: 14px;
-  margin-top: 24px;
-  padding: 22px;
-  border: 1px solid #e9cbd7;
-  border-radius: 20px;
-  background: #fff9fb;
-}
-.start-fresh > svg {
-  color: #a33e68;
-}
-.start-fresh h2 {
-  margin: 4px 0 8px;
-}
-.start-fresh > div > p:not(.eyebrow) {
-  color: #806473;
-}
-.start-fresh form {
-  display: grid;
-  gap: 9px;
-}
-.start-fresh label {
-  color: #573445;
-  font-size: 0.875rem;
-}
-.start-fresh input {
-  width: 100%;
-  min-height: 48px;
-  padding: 10px 12px;
-  border: 1px solid #e3bacb;
-  border-radius: 13px;
-  background: #fff;
-}
 .button-danger {
   justify-self: start;
   background: #8f3c58;
