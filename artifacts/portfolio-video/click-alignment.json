@@ -1,0 +1,382 @@
+[
+  {
+    "result": 7,
+    "scene": "home",
+    "target": "Memories",
+    "rect": {
+      "h": 50.7421875,
+      "text": "Memories",
+      "w": 193.37890625,
+      "x": 22.998046875,
+      "y": 273.69140625
+    },
+    "point": [
+      119.6875,
+      299.0625
+    ],
+    "click": 6.86,
+    "move_start": 6.010000000000001,
+    "arrive": 6.680000000000001
+  },
+  {
+    "result": 10,
+    "scene": "memories",
+    "target": "A table for two",
+    "rect": {
+      "h": 187.998046875,
+      "text": "Everyday magic2026-07-10A table for twoOur favorite caf\u00e9",
+      "w": 407.998046875,
+      "x": 715.99609375,
+      "y": 349.013671875
+    },
+    "point": [
+      919.9951171875,
+      443.0126953125
+    ],
+    "click": 9.86,
+    "move_start": 9.01,
+    "arrive": 9.68
+  },
+  {
+    "result": 12.5,
+    "scene": "memory-open",
+    "target": "Set as cover",
+    "rect": {
+      "h": 202.48046875,
+      "text": "Set as cover",
+      "w": 172.001953125,
+      "x": 713.994140625,
+      "y": 411.2890625
+    },
+    "point": [
+      799.9951171875,
+      512.529296875
+    ],
+    "click": 12.36,
+    "move_start": 11.51,
+    "arrive": 12.18
+  },
+  {
+    "result": 15,
+    "scene": "memory-scroll",
+    "target": "Show on Home",
+    "rect": {
+      "h": 52.3828125,
+      "text": "Show on Home",
+      "w": 187.529296875,
+      "x": 531.9921875,
+      "y": 771.123046875
+    },
+    "point": [
+      625.7568359375,
+      797.314453125
+    ],
+    "click": 14.86,
+    "move_start": 14.01,
+    "arrive": 14.68
+  },
+  {
+    "result": 16,
+    "scene": "memory-featured",
+    "target": "View Home \u2192",
+    "rect": {
+      "h": 47.998046875,
+      "text": "View Home \u2192",
+      "w": 95.595703125,
+      "x": 868.876953125,
+      "y": 734.560546875
+    },
+    "point": [
+      916.6748046875,
+      758.5595703125
+    ],
+    "click": 15.86,
+    "move_start": 15.16,
+    "arrive": 15.68
+  },
+  {
+    "result": 19,
+    "scene": "home-featured",
+    "target": "Gallery",
+    "rect": {
+      "h": 50.7421875,
+      "text": "Gallery",
+      "w": 193.37890625,
+      "x": 22.998046875,
+      "y": 331.42578125
+    },
+    "point": [
+      119.6875,
+      356.796875
+    ],
+    "click": 18.86,
+    "move_start": 18.009999999999998,
+    "arrive": 18.68
+  },
+  {
+    "result": 22,
+    "scene": "gallery",
+    "target": "Open Everyday magic \u2014 sample photo 2",
+    "rect": {
+      "h": 199.00390625,
+      "text": "Open Everyday magic \u2014 sample photo 2",
+      "w": 199.00390625,
+      "x": 500.99609375,
+      "y": 547.3046875
+    },
+    "point": [
+      600.498046875,
+      646.806640625
+    ],
+    "click": 21.86,
+    "move_start": 21.009999999999998,
+    "arrive": 21.68
+  },
+  {
+    "result": 24,
+    "scene": "viewer",
+    "target": "Favorite",
+    "rect": {
+      "h": 52.3828125,
+      "text": "Favorite",
+      "w": 135.224609375,
+      "x": 600.25390625,
+      "y": 705.244140625
+    },
+    "point": [
+      667.8662109375,
+      731.435546875
+    ],
+    "click": 23.86,
+    "move_start": 23.009999999999998,
+    "arrive": 23.68
+  },
+  {
+    "result": 25.5,
+    "scene": "viewer-favorite",
+    "target": "Next photo",
+    "rect": {
+      "h": 43.994140625,
+      "text": "Next photo",
+      "w": 43.994140625,
+      "x": 490.986328125,
+      "y": 50
+    },
+    "point": [
+      512.9833984375,
+      71.9970703125
+    ],
+    "click": 25.36,
+    "move_start": 24.509999999999998,
+    "arrive": 25.18
+  },
+  {
+    "result": 27,
+    "scene": "viewer-next",
+    "target": "Close photo",
+    "rect": {
+      "h": 43.994140625,
+      "text": "Close photo",
+      "w": 43.994140625,
+      "x": 1194.013671875,
+      "y": 50
+    },
+    "point": [
+      1216.0107421875,
+      71.9970703125
+    ],
+    "click": 26.86,
+    "move_start": 26.009999999999998,
+    "arrive": 26.68
+  },
+  {
+    "result": 28,
+    "scene": "gallery-return",
+    "target": "Favorites",
+    "rect": {
+      "h": 43.994140625,
+      "text": "Favorites",
+      "w": 133.583984375,
+      "x": 568.779296875,
+      "y": 470.693359375
+    },
+    "point": [
+      635.5712890625,
+      492.6904296875
+    ],
+    "click": 27.86,
+    "move_start": 27.16,
+    "arrive": 27.68
+  },
+  {
+    "result": 30,
+    "scene": "favorites",
+    "target": "Albums",
+    "rect": {
+      "h": 43.994140625,
+      "text": "Albums",
+      "w": 133.583984375,
+      "x": 431.201171875,
+      "y": 470.693359375
+    },
+    "point": [
+      497.9931640625,
+      492.6904296875
+    ],
+    "click": 29.86,
+    "move_start": 29.009999999999998,
+    "arrive": 29.68
+  },
+  {
+    "result": 33,
+    "scene": "albums-framed",
+    "target": "A table for two",
+    "rect": {
+      "h": 524.7265625,
+      "text": "A table for two2026-07-10 \u00b7 22 photos",
+      "w": 410.673828125,
+      "x": 714.658203125,
+      "y": 283.681640625
+    },
+    "point": [
+      919.9951171875,
+      546.044921875
+    ],
+    "click": 32.86,
+    "move_start": 32.01,
+    "arrive": 32.68
+  },
+  {
+    "result": 35.5,
+    "scene": "album-open",
+    "target": "Question",
+    "rect": {
+      "h": 50.7421875,
+      "text": "Question",
+      "w": 193.37890625,
+      "x": 22.998046875,
+      "y": 389.16015625
+    },
+    "point": [
+      119.6875,
+      414.53125
+    ],
+    "click": 35.36,
+    "move_start": 34.51,
+    "arrive": 35.18
+  },
+  {
+    "result": 37.5,
+    "scene": "question-empty",
+    "target": "Your answer",
+    "rect": {
+      "h": 125.99609375,
+      "text": "Your answer",
+      "w": 558.75,
+      "x": 640.625,
+      "y": 549.609375
+    },
+    "point": [
+      920.0,
+      612.607421875
+    ],
+    "click": 37.36,
+    "move_start": 36.51,
+    "arrive": 37.18
+  },
+  {
+    "result": 41,
+    "scene": "question-typed-2",
+    "target": "Save my answer",
+    "rect": {
+      "h": 52.3828125,
+      "text": "Save my answer",
+      "w": 172.51953125,
+      "x": 640.625,
+      "y": 685.60546875
+    },
+    "point": [
+      726.884765625,
+      711.796875
+    ],
+    "click": 40.86,
+    "move_start": 40.01,
+    "arrive": 40.68
+  },
+  {
+    "result": 43,
+    "scene": "question-saved",
+    "target": "Home",
+    "rect": {
+      "h": 50.7421875,
+      "text": "Home",
+      "w": 193.37890625,
+      "x": 22.998046875,
+      "y": 215.95703125
+    },
+    "point": [
+      119.6875,
+      241.328125
+    ],
+    "click": 42.86,
+    "move_start": 42.01,
+    "arrive": 42.68
+  },
+  {
+    "result": 44.5,
+    "scene": "home-letter",
+    "target": "LOVE LETTER",
+    "rect": {
+      "h": 170,
+      "text": "LOVE LETTERA note waiting to be opened.Read letter \u2192",
+      "w": 332.900390625,
+      "x": 872.197265625,
+      "y": 560.810546875
+    },
+    "point": [
+      1038.6474609375,
+      645.810546875
+    ],
+    "click": 44.36,
+    "move_start": 43.51,
+    "arrive": 44.18
+  },
+  {
+    "result": 47,
+    "scene": "letter-closed",
+    "target": "Open letter label",
+    "rect": {
+      "h": 47.998046875,
+      "text": "Open letter label",
+      "w": 171.69921875,
+      "x": 834.150390625,
+      "y": 576.97265625
+    },
+    "point": [
+      920.0,
+      600.9716796875
+    ],
+    "click": 46.86,
+    "move_start": 46.01,
+    "arrive": 46.68
+  },
+  {
+    "result": 53,
+    "scene": "letter-read",
+    "target": "Home",
+    "rect": {
+      "h": 50.7421875,
+      "text": "Home",
+      "w": 193.37890625,
+      "x": 22.998046875,
+      "y": 215.95703125
+    },
+    "point": [
+      119.6875,
+      241.328125
+    ],
+    "click": 52.86,
+    "move_start": 52.01,
+    "arrive": 52.68
+  }
+]

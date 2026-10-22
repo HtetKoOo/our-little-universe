@@ -1,0 +1,205 @@
+[
+  {
+    "start": 0,
+    "end": 3,
+    "image": null,
+    "title": "",
+    "subtitle": ""
+  },
+  {
+    "start": 3,
+    "end": 7,
+    "image": "home",
+    "title": "Your little world, together.",
+    "subtitle": "A shared home for the days you want to keep."
+  },
+  {
+    "start": 7,
+    "end": 10,
+    "image": "memories",
+    "title": "Keep the little days.",
+    "subtitle": "Open a memory and revisit the details."
+  },
+  {
+    "start": 10,
+    "end": 12.5,
+    "image": "memory-open",
+    "title": "Keep the little days.",
+    "subtitle": "A few words can bring an ordinary day back."
+  },
+  {
+    "start": 12.5,
+    "end": 13.4,
+    "image": "memory-cover",
+    "title": "Make it yours.",
+    "subtitle": "Choose a cover. Put a memory on Home."
+  },
+  {
+    "start": 13.4,
+    "end": 15,
+    "image": "memory-scroll",
+    "title": "Make it yours.",
+    "subtitle": "Choose a cover. Put a memory on Home."
+  },
+  {
+    "start": 15,
+    "end": 16,
+    "image": "memory-featured",
+    "title": "Make it yours.",
+    "subtitle": "Choose a cover. Put a memory on Home."
+  },
+  {
+    "start": 16,
+    "end": 19,
+    "image": "home-featured",
+    "title": "Your favorites, at home.",
+    "subtitle": "The memory you chose is waiting on your little shelf."
+  },
+  {
+    "start": 19,
+    "end": 22,
+    "image": "gallery",
+    "title": "One place for your photos.",
+    "subtitle": "Browse your shared library in a simple, even grid."
+  },
+  {
+    "start": 22,
+    "end": 24,
+    "image": "viewer",
+    "title": "Keep the ones you love.",
+    "subtitle": "Open a photo, then tap the heart."
+  },
+  {
+    "start": 24,
+    "end": 25.5,
+    "image": "viewer-favorite",
+    "title": "Keep the ones you love.",
+    "subtitle": "A little favorite, kept close."
+  },
+  {
+    "start": 25.5,
+    "end": 27,
+    "image": "viewer-next",
+    "title": "Move through your moments.",
+    "subtitle": "Next and previous, without leaving the viewer."
+  },
+  {
+    "start": 27,
+    "end": 28,
+    "image": "gallery-return",
+    "title": "Find your favorites again.",
+    "subtitle": "Your most-loved photos, together in one place."
+  },
+  {
+    "start": 28,
+    "end": 30,
+    "image": "favorites",
+    "title": "Find your favorites again.",
+    "subtitle": "Your most-loved photos, together in one place."
+  },
+  {
+    "start": 30,
+    "end": 30.7,
+    "image": "albums",
+    "title": "Every memory has its place.",
+    "subtitle": "Albums keep each little day together."
+  },
+  {
+    "start": 30.7,
+    "end": 33,
+    "image": "albums-framed",
+    "title": "Every memory has its place.",
+    "subtitle": "Albums keep each little day together."
+  },
+  {
+    "start": 33,
+    "end": 35.5,
+    "image": "album-open",
+    "title": "Every memory has its place.",
+    "subtitle": "Open a memory album and explore its photos."
+  },
+  {
+    "start": 35.5,
+    "end": 37.5,
+    "image": "question-empty",
+    "title": "A shared thought for today.",
+    "subtitle": "One small question. A little more connection."
+  },
+  {
+    "start": 37.5,
+    "end": 38,
+    "image": "question-focused",
+    "title": "A shared thought for today.",
+    "subtitle": "Write at your own pace."
+  },
+  {
+    "start": 38,
+    "end": 38.7,
+    "image": "question-typed-0",
+    "title": "A shared thought for today.",
+    "subtitle": "Write at your own pace."
+  },
+  {
+    "start": 38.7,
+    "end": 39.4,
+    "image": "question-typed-1",
+    "title": "A shared thought for today.",
+    "subtitle": "Write at your own pace."
+  },
+  {
+    "start": 39.4,
+    "end": 41,
+    "image": "question-typed-2",
+    "title": "A shared thought for today.",
+    "subtitle": "Write at your own pace."
+  },
+  {
+    "start": 41,
+    "end": 43,
+    "image": "question-saved",
+    "title": "A shared thought for today.",
+    "subtitle": "Answers stay private until both people have replied."
+  },
+  {
+    "start": 43,
+    "end": 44.5,
+    "image": "home-letter",
+    "title": "Some words deserve to stay.",
+    "subtitle": "A letter for the ordinary days, too."
+  },
+  {
+    "start": 44.5,
+    "end": 47,
+    "image": "letter-closed",
+    "title": "Some words deserve to stay.",
+    "subtitle": "A letter for the ordinary days, too."
+  },
+  {
+    "start": 47,
+    "end": 49,
+    "image": "letter-open",
+    "title": "Some words deserve to stay.",
+    "subtitle": "Open a note written from the heart."
+  },
+  {
+    "start": 49,
+    "end": 53,
+    "image": "letter-read",
+    "title": "Some words deserve to stay.",
+    "subtitle": "Read it again, whenever you need it."
+  },
+  {
+    "start": 53,
+    "end": 56,
+    "image": "home-end",
+    "title": "A thousand little moments.",
+    "subtitle": "One beautiful story."
+  },
+  {
+    "start": 56,
+    "end": 60,
+    "image": null,
+    "title": "",
+    "subtitle": ""
+  }
+]
