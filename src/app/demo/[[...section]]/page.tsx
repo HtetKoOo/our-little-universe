@@ -4,8 +4,10 @@ import { calendarDate } from "@/lib/dates";
 export const dynamic = "force-dynamic";
 export default async function Page({
   params,
+  searchParams,
 }: {
   params: Promise<{ section?: string[] }>;
+  searchParams: Promise<{ memory?: string }>;
 }) {
   const { section } = await params;
   const slug = section?.[0] ?? "home";
@@ -26,6 +28,6 @@ export default async function Page({
   )
     notFound();
   return (
-    <Preview section={slug} today={calendarDate(new Date(), "Asia/Bangkok")} />
+    <Preview initialMemoryId={(await searchParams).memory} section={slug} today={calendarDate(new Date(), "Asia/Bangkok")} />
   );
 }

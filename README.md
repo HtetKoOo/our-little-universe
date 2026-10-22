@@ -25,7 +25,7 @@ pnpm install --frozen-lockfile
 pnpm run dev
 ```
 
-Open http://localhost:3000/demo. No credentials are needed for the fictional preview. It never writes to localStorage, a database, or Cloudinary. `/space` redirects to login when the app is unconfigured. Do not enter real private content into the demo.
+Open http://localhost:3000/demo. No credentials are needed for the fictional preview. Preview choices use sessionStorage for this tab only; it never writes to localStorage, a database, or Cloudinary. `/space` redirects to login when the app is unconfigured. Do not enter real private content into the demo.
 
 ```sh
 pnpm run typecheck
@@ -37,7 +37,7 @@ pnpm run build
 ## Read the project in this order
 
 1. `src/app/layout.tsx` — common HTML shell and metadata.
-2. `src/app/demo/[[...section]]/page.tsx` — Next.js routes to all seven preview screens.
+2. `src/app/demo/[[...section]]/page.tsx` — Next.js routes to the demo screens.
 3. `src/components/shell.tsx` — navigation and responsive layout.
 4. `src/components/preview.tsx` — sample UI interactions; separate from private storage.
 5. `src/lib/db/schema.ts` — Drizzle tables, foreign keys and indexes.
@@ -154,3 +154,7 @@ private browser caching with revalidation: each request rechecks membership befo
 returning 304, avoiding another provider download when the cached image is current.
 Old photos generate the requested fixed derivative on first use; later requests
 reuse it. Thumbnail dimensions cap resolution; actual KB varies by image content.
+
+### V2 interactive demo
+
+The public `/demo` uses fictional artwork and 66 sample photos. Reviewers can try Photos / Albums / Favorites, Load more, viewer navigation, memory covers, and Show on Home for memories and up to three Gallery photos. Changes stay in this tab using session storage; **More → Reset preview choices** restores the sample state. More also shows clearly labelled illustrative storage totals. Demo actions never call private media or account mutation endpoints, and no personal uploads are accepted.

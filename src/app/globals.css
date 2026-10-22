@@ -6304,3 +6304,28 @@ body:has(.memory-detail) .private-header {
 .storage-usage-stats dd { margin: 8px 0 0; color: #943456; font-size: clamp(1.2rem, 4vw, 1.8rem); font-weight: 700; overflow-wrap: anywhere; }
 .storage-usage-note { color: #806473; font-size: .84rem; line-height: 1.7; }
 .storage-dashboard-link { display: inline-flex; align-items: center; gap: 7px; color: #943456; font-size: .85rem; text-decoration: underline; text-underline-offset: 3px; }
+.demo-gallery-navigation button { min-width: 0; min-height: 44px; padding: 10px 8px; border: 0; border-radius: 13px; background: transparent; color: #806473; font: inherit; font-size: .9rem; font-weight: 700; white-space: nowrap; cursor: pointer; }
+.demo-gallery-navigation button[aria-pressed="true"] { background: #fbe3ed; color: #a73865; }
+.demo-albums-back { margin-top: 18px; border: 0; background: transparent; cursor: pointer; }
+.demo-v2-memory-cover { position: relative; overflow: hidden; }
+.demo-v2-memory-cover > img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.demo-v2-memory-cover .cover-label { position: absolute; left: 12px; bottom: 14px; background: #fffafce8; padding: 7px; border-radius: 10px; }
+.demo-v2-memory-dialog { max-height: calc(100dvh - 32px); overflow-y: auto; }
+.demo-cover-picker { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 18px 0; }
+.demo-cover-picker button { min-width: 0; padding: 4px; border: 2px solid #efcfdd; border-radius: 12px; background: #fffafc; color: #943456; cursor: pointer; }
+.demo-cover-picker button[aria-pressed="true"] { border-color: #a73865; }
+.demo-cover-picker img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; }
+.demo-cover-picker span { display: block; padding: 6px 0; font-size: .7rem; }
+.demo-v2-memory-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; margin: 18px 0; }
+.demo-v2-memory-actions .button { display: inline-flex; align-items: center; gap: 7px; }
+.demo-v2-shelf a:last-child { grid-column: auto; }
+.demo-v2-widget-cover { width: 100%; height: 100px; object-fit: cover; border-radius: 12px; margin-bottom: 10px; }
+.demo-v2-home-photos { display: grid; grid-template-columns: 2fr 1fr; gap: 5px; height: 150px; width: 100%; overflow: hidden; border-radius: 14px; }
+.demo-v2-home-photos img { width: 100%; height: 100%; min-height: 0; object-fit: cover; }
+.demo-v2-home-photos-3 img:first-child { grid-row: span 2; }
+.demo-v2-home-photos-1 { grid-template-columns: 1fr; }
+.demo-v2-storage { margin-top: 28px; }
+.demo-v2-memory-cover { padding: 0; }
+.demo-v2-memory-cover > img { position: absolute; inset: 0; }
+.demo-v2-memory-cover .cover-label { max-width: calc(100% - 24px); font-size: .8rem; }
+.demo-gallery-navigation + .gallery-album-grid .gallery-album { font-family: inherit; text-align: left; cursor: pointer; }

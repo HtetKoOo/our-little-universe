@@ -1,20 +1,24 @@
 "use client";
 /* eslint-disable @next/next/no-img-element -- demo artwork uses local data URLs and does not need remote optimization. */
 import Link from "next/link";
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import {
   ArrowRight,
   Heart,
   Sparkles,
   Mail,
-  X,
-  MapPin,
   BookOpen,
   Images,
   MessageCircleHeart,
   NotebookText,
 } from "lucide-react";
 import { demoHeartPhotos, demoMemories, demoNotes } from "@/lib/demo";
+import { DemoMemoryCards as MemoryCards } from "./demo-v2-memory-cards";
+import { DemoGallery } from "./demo-v2-gallery";
+import { useDemoV2 } from "./demo-v2-state";
+import { demoMemoryPhotos } from "@/lib/demo-v2";
+import { demoGalleryPhotos } from "@/lib/demo";
+import { formatStorageBytes } from "@/lib/storage-usage";
 import { anniversaryStats } from "@/lib/dates";
 import { CoupleMainCard } from "@/components/couple-main-card";
 const format = (date: string) =>
@@ -41,84 +45,18 @@ function Heading({
     </div>
   );
 }
-function MemoryCards({ swipe = false }: { swipe?: boolean }) {
-  const [selected, setSelected] = useState<
-    (typeof demoMemories)[number] | null
-  >(null);
-  const dialog = useRef<HTMLDialogElement>(null);
-  useEffect(() => {
-    if (selected) dialog.current?.showModal();
-    else dialog.current?.close();
-  }, [selected]);
-  return (
-    <>
-      <div className={swipe ? "memory-grid swipe-memories" : "memory-grid"}>
-        {demoMemories.map((memory, i) => (
-          <button
-            onClick={() => setSelected(memory)}
-            className="memory-card"
-            key={memory.id}
-          >
-            <div className={`memory-cover cover-${i}`}>
-              <span className="chapter">0{i + 1}</span>
-              <span className="cover-label">{memory.category}</span>
-              <BookOpen size={28} />
-            </div>
-            <div className="memory-info">
-              <small>{format(memory.date)}</small>
-              <h3>{memory.title}</h3>
-              <span>
-                <MapPin size={13} />
-                {memory.location}
-              </span>
-            </div>
-          </button>
-        ))}
-      </div>
-      <dialog
-        ref={dialog}
-        className="detail"
-        aria-label={selected?.title ?? "Memory"}
-        onClose={() => setSelected(null)}
-        onClick={(e) => {
-          if (e.target === e.currentTarget) setSelected(null);
-        }}
-      >
-        {selected && (
-          <div>
-            <button
-              autoFocus
-              className="close"
-              aria-label="Close memory"
-              onClick={() => setSelected(null)}
-            >
-              <X />
-            </button>
-            <p className="eyebrow">A SAMPLE MEMORY</p>
-            <h2>{selected.title}</h2>
-            <small>
-              {format(selected.date)} · {selected.location}
-            </small>
-            <p className="memory-body">{selected.body}</p>
-            <button
-              className="button detail-done"
-              onClick={() => setSelected(null)}
-            >
-              Back to memories <Heart size={17} />
-            </button>
-          </div>
-        )}
-      </dialog>
-    </>
-  );
-}
 export function Preview({
   section,
   today,
+  initialMemoryId,
 }: {
   section: string;
   today: string;
+  initialMemoryId?: string;
 }) {
+  const { state, dispatch } = useDemoV2();
+  const homeMemory = demoMemories.find(memory => memory.id === state.homeMemory) ?? demoMemories[0];
+  const homePhotos = state.homePhotos.length ? state.homePhotos.map(id => demoGalleryPhotos.find(photo => photo.id === id)!) : demoGalleryPhotos.slice(0, 3);
   const stats = anniversaryStats("2025-09-14", today);
   const [noteIndex, setNoteIndex] = useState(-1);
   const [openLetter, setOpenLetter] = useState(false);
@@ -139,8 +77,9 @@ export function Preview({
           />
           <div className="demo-current-shelf">
             <div className="demo-shelf-heading"><p className="eyebrow">A LITTLE CORNER OF US</p><h2>Our little shelf.</h2></div>
-            <div className="demo-shelf-grid">
-              <Link href="/demo/memories"><Heart size={20} /><p>OUR MEMORIES</p><h3>Three little days to revisit.</h3><small>Open memories →</small></Link>
+            <div className="demo-shelf-grid demo-v2-shelf">
+              <Link href="/demo/gallery" className="demo-v2-home-gallery"><div className={`demo-v2-home-photos demo-v2-home-photos-${homePhotos.length}`}>{homePhotos.map(photo => <img key={photo.id} src={photo.src} alt="" />)}</div><p>OUR PHOTOS</p><small>Open gallery →</small></Link>
+              <Link href={`/demo/memories?memory=${homeMemory.id}`}><img className="demo-v2-widget-cover" src={demoMemoryPhotos(homeMemory.id, state)[0].src} alt="" /><Heart size={20} /><p>{state.homeMemory ? "A MEMORY WE CHOSE" : "OUR LATEST MEMORY"}</p><h3>{homeMemory.title}</h3><small>Open memories →</small></Link>
               <Link href="/demo/letters"><Mail size={20} /><p>LOVE LETTER</p><h3>A note waiting to be opened.</h3><small>Read letter →</small></Link>
               <Link href="/demo/jar"><Sparkles size={20} /><p>MEMORY JAR</p><h3>Pick a small reminder.</h3><small>Open the jar →</small></Link>
             </div>
@@ -164,7 +103,7 @@ export function Preview({
           title="Our memories"
           description="Not every day was a milestone. Every one mattered."
         />
-        <MemoryCards />
+        <MemoryCards key={initialMemoryId ?? "all"} initialMemoryId={initialMemoryId} />
         <p className="sample-hint">
           Open a card to read a sample memory. Adding your own comes after
           private account setup.
@@ -203,6 +142,7 @@ export function Preview({
         <Link href="/demo/jar"><Sparkles size={22} /><span><strong>Memory Jar</strong><small>Pick a little reminder.</small></span><ArrowRight size={19} /></Link>
         <Link href="/demo/anniversary"><Heart size={22} /><span><strong>Anniversary</strong><small>A day to look forward to.</small></span><ArrowRight size={19} /></Link>
       </section>
+      <section className="private-account storage-usage demo-v2-storage"><h2>Photo storage · Sample</h2><dl className="storage-usage-stats"><div><dt>Saved photos</dt><dd>{demoGalleryPhotos.length}</dd></div><div><dt>Saved file size</dt><dd>{formatStorageBytes(demoGalleryPhotos.reduce((total, photo) => total + photo.bytes, 0))}</dd></div></dl><p className="storage-usage-note">Illustrative sample totals, not real account usage. Preview images and bandwidth are not included.</p><button type="button" className="button light" onClick={() => dispatch({ type: "reset" })}>Reset preview choices</button></section>
     </>;
   if (section === "story")
     return (
@@ -224,19 +164,7 @@ export function Preview({
         </div>
       </>
     );
-  if (section === "gallery")
-    return (
-      <>
-        <Heading
-          label="THROUGH OUR EYES"
-          title="Our gallery"
-          description="A home for the photos and films that feel like us."
-        />
-        <section className="demo-gallery-grid" aria-label="Sample gallery">
-          {demoHeartPhotos.map((photo, index) => <figure key={photo.src}><img src={photo.src} alt={photo.alt} /><figcaption>Sample moment {index + 1}</figcaption></figure>)}
-        </section>
-      </>
-    );
+  if (section === "gallery") return <DemoGallery />;
   if (section === "letters")
     return (
       <>
