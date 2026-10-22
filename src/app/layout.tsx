@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { PwaProvider } from "@/components/pwa-provider";
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
@@ -12,6 +13,8 @@ export const metadata: Metadata = {
     template: "%s · Our Little Universe",
   },
   description: "A private place for our story.",
+  appleWebApp: { capable: true, title: "Our Universe", statusBarStyle: "default" },
+  icons: { apple: "/pwa/apple-touch-icon.png" },
   robots: { index: false, follow: false },
 };
 export default function RootLayout({
@@ -19,7 +22,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body><PwaProvider>{children}</PwaProvider></body>
     </html>
   );
 }

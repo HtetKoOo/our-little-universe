@@ -20,6 +20,7 @@ import {
 const links = [
   ["", "Home", House],
   ["memories", "Memories", Camera],
+  ["gallery", "Gallery", Images],
   ["questions", "Question", MessageCircleHeart],
   ["notes", "Notes", NotebookText],
   ["more", "More", Ellipsis],
@@ -92,7 +93,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           </Link>
         </header>
         <div className="demo-banner">
-          <span className="status-dot" /> Sample preview · Nothing is saved.
+          <span className="status-dot" /> Sample preview · Changes stay in this tab.
           <Link href="/login">Set up →</Link>
         </div>
         <main id="main-content" className="content">

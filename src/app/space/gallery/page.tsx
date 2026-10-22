@@ -6,7 +6,8 @@ import { readHeartPhoto, preserveHeartPhotos } from "@/lib/heart-photo";
 import { SharedGallery } from "@/components/shared-gallery";
 import { GalleryNavigation } from "@/components/gallery-navigation";
 import { requireCouple } from "@/lib/authorization";
-import { listMediaAssets, mediaConfigured } from "@/lib/media";
+import { mediaConfigured } from "@/lib/media";
+import { listGalleryPhotos } from "@/lib/gallery-photos";
 import { GalleryCover } from "@/components/gallery-cover";
 import { findGalleryAlbum, listGalleryAlbums } from "@/lib/gallery-albums";
 
@@ -42,6 +43,6 @@ export default async function GalleryPage({ searchParams }: {
   const heart = await readHeartPhoto(couple);
   await preserveHeartPhotos(couple, heart.photos ?? []);
   const favoritesOnly = query.view === "favorites";
-  const assets = await listMediaAssets(couple, favoritesOnly);
-  return <SharedGallery homePhotoIds={homePhotoIds} key={favoritesOnly ? "favorites" : "photos"} favoritesOnly={favoritesOnly} uploadsEnabled={!favoritesOnly && mediaConfigured()} initialAssets={assets.map(({ id, width, height, createdAt, isFavorite }) => ({ id, width, height, createdAt, isFavorite }))} />;
+  const page = await listGalleryPhotos(couple, favoritesOnly);
+  return <SharedGallery homePhotoIds={homePhotoIds} key={favoritesOnly ? "favorites" : "photos"} favoritesOnly={favoritesOnly} uploadsEnabled={!favoritesOnly && mediaConfigured()} initialAssets={page.assets} initialNextCursor={page.nextCursor} />;
 }

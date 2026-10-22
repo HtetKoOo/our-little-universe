@@ -40,3 +40,12 @@ export const demoHeartPhotos = [
   { src: demoHeartSlide("#d9c8ef", "#f8e3c4", "#9b5b87"), alt: "A lavender sample moment" },
   { src: demoHeartSlide("#f3c9bc", "#f7dfd5", "#a85171"), alt: "A warm sample moment" },
 ];
+
+// Sample metadata only: these sizes illustrate originals without uploading files.
+export const demoGalleryPhotos = Array.from({ length: 66 }, (_, index) => ({
+  id: `sample-photo-${index + 1}`,
+  memoryId: demoMemories[index % demoMemories.length].id,
+  src: demoHeartPhotos[(index + Math.floor(index / 3)) % demoHeartPhotos.length].src,
+  alt: `${demoMemories[index % demoMemories.length].category} — sample photo ${index + 1}`,
+  bytes: 1_200_000 + index * 12_500,
+}));

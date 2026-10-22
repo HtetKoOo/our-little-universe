@@ -25,7 +25,7 @@ pnpm install --frozen-lockfile
 pnpm run dev
 ```
 
-Open http://localhost:3000/demo. No credentials are needed for the fictional preview. It never writes to localStorage, a database, or Cloudinary. `/space` redirects to login when the app is unconfigured. Do not enter real private content into the demo.
+Open http://localhost:3000/demo. No credentials are needed for the fictional preview. Preview choices use sessionStorage for this tab only; it never writes to localStorage, a database, or Cloudinary. `/space` redirects to login when the app is unconfigured. Do not enter real private content into the demo.
 
 ```sh
 pnpm run typecheck
@@ -37,7 +37,7 @@ pnpm run build
 ## Read the project in this order
 
 1. `src/app/layout.tsx` — common HTML shell and metadata.
-2. `src/app/demo/[[...section]]/page.tsx` — Next.js routes to all seven preview screens.
+2. `src/app/demo/[[...section]]/page.tsx` — Next.js routes to the demo screens.
 3. `src/components/shell.tsx` — navigation and responsive layout.
 4. `src/components/preview.tsx` — sample UI interactions; separate from private storage.
 5. `src/lib/db/schema.ts` — Drizzle tables, foreign keys and indexes.
@@ -142,6 +142,10 @@ Memory photos support **Set as cover** in the create/edit form; save the memory 
 
 Open a Gallery photo and tap **Show on Home** to choose up to three photos for the shared Gallery widget. The first selected photo is the main image (and the one shown in half-width mode). **Remove from Home** removes that selection without deleting the photo. With no selected photos, Home uses the latest Gallery photos automatically. This uses existing Home settings and needs no new database migration.
 
+**More → Our space → Photo storage** shows the shared library photo count and total stored file bytes. Reused photos count once. This is an app library total, excluding Cloudinary derived previews, abandoned uploads, bandwidth and other account assets. The owner can open the Cloudinary console for full account usage; the app does not call Cloudinary usage APIs to render this indicator.
+
+Gallery Photos and Favorites load 60 photos at a time with **Load more photos** for older images. The viewer supports **Previous / Next** and keyboard arrow keys; Next at the end of a loaded page fetches the next page. Albums use the same viewer navigation. Only the current photo loads its larger preview.
+
 Gallery has Photos, Albums, and Favorites views. Open a photo and use the heart to add or remove it from the couple’s shared Favorites. Before deploying this update, run `pnpm db:migrate` to apply migration 0017, which adds the favorite flag. Each memory with photos automatically becomes an album, using its first photo as the cover. Albums show the memory date and photo count; opening one loads its attached photos in order. Edit the memory to manage its album. Removing a memory does not remove its photos from the shared library. Albums reuse existing attachments without duplicating files.
 
 Gallery and photo pickers load low-quality 320px thumbnails; opening a photo loads
@@ -150,3 +154,21 @@ private browser caching with revalidation: each request rechecks membership befo
 returning 304, avoiding another provider download when the cached image is current.
 Old photos generate the requested fixed derivative on first use; later requests
 reuse it. Thumbnail dimensions cap resolution; actual KB varies by image content.
+
+### V2 interactive demo
+
+The public `/demo` uses fictional artwork and 66 sample photos. Reviewers can try Photos / Albums / Favorites, Load more, viewer navigation, memory covers, and Show on Home for memories and up to three Gallery photos. Changes stay in this tab using session storage; **More → Reset preview choices** restores the sample state. More also shows clearly labelled illustrative storage totals. Demo actions never call private media or account mutation endpoints, and no personal uploads are accepted.
+
+### V2 PWA
+
+The app has a standalone web manifest, 192/512px icons, a maskable icon and an Apple Home Screen icon. Launching the installed app opens `/space` and uses the existing account/session checks.
+
+**More → Our space → Keep us on your Home Screen** has installation instructions and an Install button when the browser supplies an installation prompt. On iPhone/iPad, open in Safari and use **Share → Add to Home Screen → Add**. Availability and menu wording depend on the browser/device.
+
+The service worker registers only in production on HTTPS (or a trusted localhost). It caches only `/offline.html`, `/pwa/offline.css`, and `/pwa/offline.js`. Private pages, API responses, RSC requests, photo files and authentication data are never written to its cache. A failed full-page navigation shows a public offline screen with Retry; an open app shows a connectivity notice. Online use is required for app content. Existing private browser photo-cache behavior is unchanged.
+
+A new build changes the worker version automatically. A waiting update displays **Refresh app / Later**; only the tab whose user chooses Refresh reloads. Save drafts first. There is no automatic reload, offline mutation queue, offline photo library, or push notification feature in this release. Backgrounding all tabs or closing the app can also allow normal browser worker activation.
+
+Verify PWA behavior with `pnpm build` then `pnpm start` (use a separate localhost port when a development server is running). The worker is disabled during `pnpm dev`. In browser developer tools, check the manifest/icons, root worker scope, and that its cache contains only the three public files. Test a full-page reload offline, Retry after reconnecting, installation on iPhone/Android, and a second deployment while an existing app tab remains open. Installation testing does not require sending emails or changing account data.
+
+Browser API references: [installation prompt](https://developer.mozilla.org/en-US/docs/Web/API/BeforeInstallPromptEvent), [waiting worker activation](https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerGlobalScope/skipWaiting).
