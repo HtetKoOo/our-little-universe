@@ -1,6 +1,7 @@
 "use client";
 /* eslint-disable @next/next/no-img-element -- authenticated photos must use the app's private media route. */
 
+import { GalleryEntryLink } from "./gallery-history";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
@@ -45,11 +46,11 @@ export function HomeWidgets({ config, latest, milestone, featured = null, memory
   const widget = (item: HomeWidgetConfig) => {
     const full = item.size === "full";
     const className = `home-widget home-widget-${item.id} home-widget-${item.size}${item.id === "memory" && full && favoriteCoverSrc ? " home-widget-memory-with-cover" : ""}`;
-    if (item.id === "photo") return <Link className={className} href="/space/gallery" onClick={(event) => editing && event.preventDefault()}>
+    if (item.id === "photo") return <GalleryEntryLink className={className} onClick={(event) => editing && event.preventDefault()}>
       {photoSources.length ? full ? <div className={`home-photo-collage home-photo-collage-count-${photoSources.length}`} aria-hidden="true"><GalleryPhoto className="home-photo-collage-main" src={photoSources[0]!} />{photoSources.slice(1, 3).map((src, index) => <GalleryPhoto className={`home-photo-collage-small home-photo-collage-small-${index}`} src={src} key={src} />)}</div> : <GalleryPhoto className="home-photo-single" src={photoSources[0]!} /> : <span className="home-photo-placeholder" aria-hidden="true">♡</span>}
       <div className="home-widget-copy"><p>OUR PHOTOS</p>{full && <h3>A little us, lately.</h3>}</div>
       <small><b>{photoSources.length ? "Open gallery →" : "Add our first photo →"}</b></small>
-    </Link>;
+    </GalleryEntryLink>;
     if (item.id === "jar") return <Link className={className} href="/space/jar" onClick={(event) => editing && event.preventDefault()}>
       <span className="home-widget-icon"><Sparkles size={19} aria-hidden="true" /></span><p>MEMORY JAR</p><h3>{full ? "Open a little note." : "A tiny note."}</h3>{full && <span>Leave a thought for another day, then let a small surprise find you.</span>}<small><b>{full ? "Open the jar →" : "Open →"}</b></small>
     </Link>;
