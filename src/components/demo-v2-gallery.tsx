@@ -1,5 +1,6 @@
 "use client";
 /* eslint-disable @next/next/no-img-element -- fictional local artwork. */
+import { ViewerPhoto } from "./viewer-photo";
 import { useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Heart, House, X } from "lucide-react";
 import { demoGalleryPhotos, demoMemories } from "@/lib/demo";
@@ -38,7 +39,7 @@ export function DemoGallery() {
         <button type="button" className="gallery-viewer-close" aria-label="Previous photo" disabled={index <= 0} onClick={() => move(-1)}><ChevronLeft size={22} /></button><span>{index + 1} / {photos.length}</span>
         <button type="button" className="gallery-viewer-close" aria-label="Next photo" disabled={index >= photos.length - 1} onClick={() => move(1)}><ChevronRight size={22} /></button>
       </div><button type="button" className="gallery-viewer-close" aria-label="Close photo" onClick={() => dialog.current?.close()}><X size={24} /></button></div>
-      <div className="gallery-viewer-image"><img src={active.src} alt={active.alt} /></div>
+      <div className="gallery-viewer-image"><ViewerPhoto key={active.id} src={active.src} alt={active.alt} onNavigate={move} /></div>
       <div className="gallery-viewer-footer">
         <button type="button" className="button light gallery-favorite-button" aria-pressed={state.favorites.includes(active.id)} onClick={() => { dispatch({ type: "favorite", id: active.id }); if (tab === "favorites") dialog.current?.close(); }}><Heart size={18} fill={state.favorites.includes(active.id) ? "currentColor" : "none"} />{state.favorites.includes(active.id) ? "Favorited" : "Favorite"}</button>
         <a className="button light" href={active.src} download="sample-artwork.svg">Download sample artwork</a>
