@@ -2,6 +2,7 @@
 /* eslint-disable @next/next/no-img-element -- private media is served through the session-protected app endpoint. */
 
 import { useEffect, useRef, useState } from "react";
+import { ViewerPhoto } from "./viewer-photo";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 
 type Photo = { id: string; alt: string };
@@ -36,11 +37,11 @@ export function MemoryPhotoGallery({ photos }: { photos: Photo[] }) {
         {index === 3 && photos.length > 4 && <span className="memory-photo-more">+{photos.length - 4} photos</span>}
       </button>)}
     </section>
-    <dialog ref={dialog} className="memory-photo-viewer" aria-label={active ? `Photo ${selected! + 1} of ${photos.length}` : "Photo viewer"} onClose={() => setSelected(null)}>
+    <dialog ref={dialog} className="memory-photo-viewer" aria-label={active ? `Photo ${selected! + 1} of ${photos.length}` : "Photo viewer"} onClose={() => setSelected(null)} onKeyDown={event => { if (selected !== null && photos.length > 1 && (event.key === "ArrowLeft" || event.key === "ArrowRight")) { event.preventDefault(); change(selected + (event.key === "ArrowLeft" ? -1 : 1)); } }}>
       {active && <div className="memory-photo-viewer-content">
         <button type="button" className="memory-viewer-close" onClick={() => setSelected(null)} aria-label="Close photo"><X size={24} aria-hidden="true" /></button>
         {photos.length > 1 && <button type="button" className="memory-viewer-arrow memory-viewer-previous" onClick={() => change(selected! - 1)} aria-label="Previous photo"><ChevronLeft size={28} aria-hidden="true" /></button>}
-        <PrivatePhoto key={active.id} photo={active} className="memory-viewer-image" />
+        <div className="memory-viewer-image"><ViewerPhoto key={active.id} src={`/api/media/${active.id}`} alt={active.alt} onNavigate={direction => { if (photos.length > 1) change(selected! + direction); }} /></div>
         {photos.length > 1 && <button type="button" className="memory-viewer-arrow memory-viewer-next" onClick={() => change(selected! + 1)} aria-label="Next photo"><ChevronRight size={28} aria-hidden="true" /></button>}
         {photos.length > 1 && <p className="memory-viewer-count">{selected! + 1} / {photos.length}</p>}
       </div>}

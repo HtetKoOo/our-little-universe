@@ -6317,3 +6317,14 @@ body:has(.memory-detail) .private-header {
 .navigation-feedback.is-pending { opacity: .55; }
 .section-loading { display: grid; gap: 24px; }
 .section-loading .loading-card { display: grid; align-content: start; gap: 20px; min-height: 180px; padding: 24px; }
+
+/* One active preview at a time: preserve browser zoom and vertical scrolling. */
+.viewer-photo { position: relative; width: 100%; height: 100%; min-height: 100px; display: grid; place-items: center; }
+.viewer-photo > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 1; }
+.viewer-photo-loading > img { opacity: 0; }
+.viewer-photo-status { position: relative; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 24px; text-align: center; color: #f6dbe6; }
+.viewer-photo-status small { color: #dbc2cf; }
+.viewer-photo-status .button { min-height: 44px; margin: 8px 0 0; }
+.memory-viewer-image .viewer-photo > img { opacity: 1; }
+.memory-viewer-image .viewer-photo-loading > img { opacity: 0; }
+.memory-viewer-close, .memory-viewer-arrow { z-index: 1; }
