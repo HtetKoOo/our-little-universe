@@ -3,7 +3,9 @@
 
 import { uploadPhotoBatch, type FailedPhotoUpload, type UploadProgress } from "@/lib/media-upload-queue";
 import { MAX_MEMORY_UPLOAD_BATCH, MAX_MEMORY_IMAGE_BYTES } from "@/lib/media-input";
-import { useRef, useState } from "react";
+import { restoreGalleryPage, rememberGalleryEntry } from "@/lib/gallery-history";
+import { useGalleryHistory, useGalleryPosition } from "./gallery-history";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ViewerPhoto } from "./viewer-photo";
 import { GalleryHomeControl } from "./gallery-home-control";
@@ -13,18 +15,28 @@ import { ChevronLeft, ChevronRight, Heart, ImagePlus, LoaderCircle, X } from "lu
 
 export type GalleryAsset = { id: string; width: number | null; height: number | null; createdAt: Date | string; isFavorite?: boolean };
 
-export function SharedGallery({ initialAssets, uploadsEnabled, album, favoritesOnly = false, homePhotoIds = [], initialNextCursor = null }: { initialAssets: GalleryAsset[]; initialNextCursor?: string | null; uploadsEnabled: boolean; homePhotoIds?: string[]; favoritesOnly?: boolean; album?: { id: string; title: string } }) {
+export function SharedGallery({ historyScope, initialAssets, uploadsEnabled, album, favoritesOnly = false, homePhotoIds = [], initialNextCursor = null }: { historyScope: string; initialAssets: GalleryAsset[]; initialNextCursor?: string | null; uploadsEnabled: boolean; homePhotoIds?: string[]; favoritesOnly?: boolean; album?: { id: string; title: string } }) {
+  const history = useGalleryHistory();
+  const href = album ? `/space/gallery?album=${album.id}` : favoritesOnly ? "/space/gallery?view=favorites" : "/space/gallery";
+  const cacheKey = `${historyScope}:${href}`;
+  const [restored] = useState(() => restoreGalleryPage(initialAssets, initialNextCursor, history.pages.get(cacheKey)));
+  useGalleryPosition(cacheKey, href, !history.pages.has(cacheKey) || restored.restored);
   const [chosenHomePhotos, setChosenHomePhotos] = useState(homePhotoIds);
   const input = useRef<HTMLInputElement>(null);
   const viewer = useRef<HTMLDialogElement>(null);
-  const [assets, setAssets] = useState(initialAssets);
+  const [assets, setAssets] = useState(restored.assets);
   const [active, setActive] = useState<GalleryAsset | null>(null);
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState("");
   const [failures, setFailures] = useState<FailedPhotoUpload[]>([]);
   const [progress, setProgress] = useState<UploadProgress | null>(null);
   const uploading = useRef(false);
-  const [nextCursor, setNextCursor] = useState(initialNextCursor);
+  const [nextCursor, setNextCursor] = useState(restored.nextCursor);
+  useEffect(() => {
+    rememberGalleryEntry(history.pages, cacheKey, {
+      headIds: initialAssets.map(asset => asset.id), assets, nextCursor,
+    });
+  }, [history.pages, cacheKey, initialAssets, assets, nextCursor]);
   const [loadingMore, setLoadingMore] = useState(false);
   const [pageError, setPageError] = useState("");
   const pageRequest = useRef(false);
@@ -121,7 +133,7 @@ export function SharedGallery({ initialAssets, uploadsEnabled, album, favoritesO
     <div className="shared-gallery-heading"><div><p className="eyebrow">OUR LITTLE GALLERY</p><h1 id="gallery-title">{album?.title ?? (favoritesOnly ? "Our favorite photos." : "Photos we keep close.")}</h1><p>{album ? `${assets.length} ${assets.length === 1 ? "photo" : "photos"} kept in this memory.` : favoritesOnly ? "The photos we love a little extra. Favorites are shared by both of you." : "Add up to 10 photos at a time, ready to use in any memory later."}</p></div></div>
     <GalleryNavigation active={album ? "albums" : favoritesOnly ? "favorites" : "photos"} />
     {uploadsEnabled && <button type="button" className="button gallery-upload-button" onClick={() => input.current?.click()} disabled={pending}>{pending ? <LoaderCircle className="media-spin" size={18} aria-hidden="true" /> : <ImagePlus size={18} aria-hidden="true" />}{pending ? "Adding…" : "Add photos"}</button>}
-    {album && <div className="gallery-album-actions"><Link href="/space/gallery?view=albums">← All albums</Link><Link href={`/space/memories/${album.id}`}>Open memory →</Link></div>}
+    {album && <div className="gallery-album-actions"><Link scroll={false} href={history.lastAlbumsHref}>← All albums</Link><Link href={`/space/memories/${album.id}`}>Open memory →</Link></div>}
     <input ref={input} className="file-input" type="file" multiple disabled={pending} accept="image/jpeg,image/png,image/webp" onChange={(event) => { void upload(Array.from(event.target.files ?? [])); event.target.value = ""; }} />
     <p className="gallery-status" role="status">{message}</p>
     {pending && progress && <div className="media-batch-status" role="status"><p>{progress.waiting ? "Waiting a moment…" : "Adding photos…"} {progress.completed} / {progress.total}</p><progress value={progress.completed} max={progress.total} aria-label="Gallery photo upload progress" /></div>}

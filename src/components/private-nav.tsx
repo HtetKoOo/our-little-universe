@@ -1,4 +1,5 @@
 "use client";
+import { useGalleryHistory } from "./gallery-history";
 import Link from "next/link";
 import { NavigationFeedback } from "./navigation-feedback";
 import { usePathname } from "next/navigation";
@@ -6,6 +7,7 @@ import { useEffect, useState } from "react";
 import { Heart, House, Images, MessageCircleHeart, MoreHorizontal, NotebookText } from "lucide-react";
 export function PrivateNav() {
   const path = usePathname();
+  const { lastHref } = useGalleryHistory();
   const [questionAttention, setQuestionAttention] = useState(false);
 
   useEffect(() => {
@@ -50,7 +52,8 @@ export function PrivateNav() {
           <Link
             className={href === "/space/gallery" ? "private-nav-gallery" : undefined}
             key={href}
-            href={href}
+            href={href === "/space/gallery" ? lastHref : href}
+            scroll={href === "/space/gallery" ? false : undefined}
             aria-current={active ? "page" : undefined}
           >
             <span className="private-nav-icon"><Icon size={20} aria-hidden="true" />{href === "/space/questions" && questionAttention ? <i className="question-nav-badge" aria-label="A question needs your attention" /> : null}</span>
