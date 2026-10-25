@@ -1,5 +1,2 @@
-import { SectionLoading } from "@/components/section-loading";
-
-export default function Loading() {
-  return <SectionLoading />;
-}
+import { DataPlaceholder } from "@/components/route-loading";
+export default function Loading() { return <section aria-busy="true" aria-label="Loading your details"><p className="eyebrow">THE DETAILS THAT MAKE US, US</p><h1>Our details.</h1><div className="private-form" role="status"><fieldset disabled>{["Our space name", "Together since", "Our timezone"].map((label, i) => <div className="loading-form-field" key={label}><label htmlFor={`loading-setting-${i}`}>{label}</label><input id={`loading-setting-${i}`} type={i === 1 ? "date" : "text"} /><small className="field-error" /></div>)}<small>Used for today’s date and our anniversary countdown.</small><button className="button" disabled>Save our details</button></fieldset><p className="form-status" /></div><section className="private-account"><h2>Your birthday</h2><div className="private-form"><fieldset disabled><label htmlFor="loading-birthday">Your birthday <span>(private)</span></label><input id="loading-birthday" type="date" /><small>Used only to send a birthday email to you and your person.</small><button className="button" disabled>Save my birthday</button></fieldset></div></section><section className="private-account"><DataPlaceholder wide /></section></section>; }

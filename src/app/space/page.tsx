@@ -1,3 +1,5 @@
+import { cache, Suspense } from "react";
+import { CoupleCardLoading, HomeWidgetsLoading } from "@/components/home-loading";
 import { listMediaAssets } from "@/lib/media";
 import { readHeartPhoto, photoConfigured, preserveHeartPhotos } from "@/lib/heart-photo";
 import { requireCouple } from "@/lib/authorization";
@@ -8,15 +10,19 @@ import { HomeWidgets } from "@/components/home-widgets";
 import { PartnerPresence } from "@/components/partner-presence";
 import { homeMemorySnapshot } from "@/lib/memories";
 import { normalizeHomeWidgets } from "@/lib/home-widgets";
-export default async function Space() {
-  const couple = await requireCouple();
+const readHomeHeart = cache(async (couple: Couple) => {
   const heart = await readHeartPhoto(couple);
   await preserveHeartPhotos(couple, heart.photos ?? []);
+  return heart;
+});
 
-  const [library, snapshot] = await Promise.all([listMediaAssets(couple), homeMemorySnapshot()]);
+type Couple = Awaited<ReturnType<typeof requireCouple>>;
 
+async function HomeCard({ couplePromise }: { couplePromise: Promise<Couple> }) {
+  const couple = await couplePromise;
+  const heart = await readHomeHeart(couple);
+  const library = await listMediaAssets(couple);
   return (
-    <section className="space-home">
       <EditableCoupleCard
         key={`${couple.cardRevision}-${heart.revision}`}
         library={library.map(({id, width, height, format}) => ({id, width, height, format}))}
@@ -31,7 +37,14 @@ export default async function Space() {
         timezone={couple.timezone}
         initialToday={calendarDate(new Date(), couple.timezone)}
       />
-      <PartnerPresence />
+  );
+}
+
+async function HomeShelf({ couplePromise }: { couplePromise: Promise<Couple> }) {
+  const couple = await couplePromise;
+  await readHomeHeart(couple);
+  const snapshot = await homeMemorySnapshot();
+  return (
       <HomeWidgets
         key={couple.homeWidgetsRevision}
         featured={snapshot.featured}
@@ -49,6 +62,25 @@ export default async function Space() {
         )}
 
       />
-    </section>
   );
+}
+
+async function HomeContent() {
+  const couple = await requireCouple();
+  const couplePromise = Promise.resolve(couple);
+  return <section className="space-home">
+    <Suspense fallback={<CoupleCardLoading text={couple.cardText ?? defaultCardText} />}>
+      <HomeCard couplePromise={couplePromise} />
+    </Suspense>
+    <PartnerPresence />
+    <Suspense fallback={<HomeWidgetsLoading config={normalizeHomeWidgets(couple.homeWidgets)} />}>
+      <HomeShelf couplePromise={couplePromise} />
+    </Suspense>
+  </section>;
+}
+
+export default function Space() {
+  return <Suspense fallback={<section className="space-home"><CoupleCardLoading /><p className="partner-presence" aria-hidden="true"><span className="home-data-placeholder">Loading partner status</span></p><HomeWidgetsLoading /></section>}>
+    <HomeContent />
+  </Suspense>;
 }

@@ -19,7 +19,7 @@ function GalleryPhoto({ src, className }: { src: string; className: string }) {
   </span>;
 }
 
-export function HomeWidgets({ config, latest, milestone, featured = null, memoryCount, favoriteCoverSrc, galleryPhotoSrcs }: { config: HomeWidgetConfig[]; featured?: Memory; latest: Memory; milestone: Memory; memoryCount: number; favoriteCoverSrc?: string; galleryPhotoSrcs: string[] }) {
+export function HomeWidgets({ config, latest, milestone, featured = null, memoryCount, favoriteCoverSrc, galleryPhotoSrcs, loading = false }: { loading?: boolean; config: HomeWidgetConfig[]; featured?: Memory; latest: Memory; milestone: Memory; memoryCount: number; favoriteCoverSrc?: string; galleryPhotoSrcs: string[] }) {
   const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(config);
@@ -46,6 +46,13 @@ export function HomeWidgets({ config, latest, milestone, featured = null, memory
   const widget = (item: HomeWidgetConfig) => {
     const full = item.size === "full";
     const className = `home-widget home-widget-${item.id} home-widget-${item.size}${item.id === "memory" && full && favoriteCoverSrc ? " home-widget-memory-with-cover" : ""}`;
+    if (loading && (item.id === "memory" || item.id === "photo")) return <div className={className} aria-busy="true" role="status" aria-label={item.id === "photo" ? "Loading gallery photos" : "Loading memory"}>
+      {item.id === "photo" ? (full ? <div className="home-photo-collage home-photo-collage-count-1" aria-hidden="true"><span className="home-photo-collage-main home-data-placeholder" /></div> : <span className="home-photo-single home-data-placeholder" aria-hidden="true" />) : <span className="home-widget-icon"><Heart size={19} aria-hidden="true" /></span>}
+      <div className="home-widget-copy"><p>{item.id === "photo" ? "OUR PHOTOS" : "OUR LATEST MEMORY"}</p>
+      {(full || item.id === "memory") && <h3>{item.id === "photo" ? "A little us, lately." : <span className="home-data-placeholder">&nbsp;</span>}</h3>}</div>
+      {full && item.id === "memory" && <span className="home-data-placeholder">&nbsp;</span>}
+      <small><span className="home-data-placeholder">&nbsp;</span></small>
+    </div>;
     if (item.id === "photo") return <GalleryEntryLink className={className} onClick={(event) => editing && event.preventDefault()}>
       {photoSources.length ? full ? <div className={`home-photo-collage home-photo-collage-count-${photoSources.length}`} aria-hidden="true"><GalleryPhoto className="home-photo-collage-main" src={photoSources[0]!} />{photoSources.slice(1, 3).map((src, index) => <GalleryPhoto className={`home-photo-collage-small home-photo-collage-small-${index}`} src={src} key={src} />)}</div> : <GalleryPhoto className="home-photo-single" src={photoSources[0]!} /> : <span className="home-photo-placeholder" aria-hidden="true">♡</span>}
       <div className="home-widget-copy"><p>OUR PHOTOS</p>{full && <h3>A little us, lately.</h3>}</div>
@@ -64,7 +71,7 @@ export function HomeWidgets({ config, latest, milestone, featured = null, memory
   return <section className={`home-widgets${editing ? " home-widgets-editing" : ""}`} aria-labelledby="little-corners">
     <div className="home-widgets-heading">
       <div><p className="eyebrow">A LITTLE CORNER OF US</p><h2 id="little-corners">Our little shelf.</h2></div>
-      {!editing ? <button type="button" className="home-customize-link" onClick={begin}><SlidersHorizontal size={16} aria-hidden="true" />Customize home</button> : <span className="home-editing-label"><Pencil size={14} aria-hidden="true" />Editing Home</span>}
+      {!editing ? <button type="button" className="home-customize-link" onClick={begin} disabled={loading}><SlidersHorizontal size={16} aria-hidden="true" />Customize home</button> : <span className="home-editing-label"><Pencil size={14} aria-hidden="true" />Editing Home</span>}
     </div>
     {editing && <p className="home-editing-note">Try the arrangement here. Nothing changes for your person until you save.</p>}
     <div className="home-widget-grid">
