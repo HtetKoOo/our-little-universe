@@ -7,7 +7,10 @@ import { restoreGalleryPage, rememberGalleryEntry } from "@/lib/gallery-history"
 import { useGalleryHistory, useGalleryPosition } from "./gallery-history";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ViewerPhoto } from "./viewer-photo";
+import dynamic from "next/dynamic";
+const ViewerPhoto = dynamic(() => import("./viewer-photo").then(module => module.ViewerPhoto), {
+  loading: () => <p role="status">Opening photo…</p>,
+});
 import { GalleryHomeControl } from "./gallery-home-control";
 import { GalleryNavigation } from "./gallery-navigation";
 import { mergeGalleryPhotos } from "@/lib/gallery-pagination";

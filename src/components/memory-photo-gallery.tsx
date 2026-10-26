@@ -2,7 +2,10 @@
 /* eslint-disable @next/next/no-img-element -- private media is served through the session-protected app endpoint. */
 
 import { useEffect, useRef, useState } from "react";
-import { ViewerPhoto } from "./viewer-photo";
+import dynamic from "next/dynamic";
+const ViewerPhoto = dynamic(() => import("./viewer-photo").then(module => module.ViewerPhoto), {
+  loading: () => <p role="status">Opening photo…</p>,
+});
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 
 type Photo = { id: string; alt: string };

@@ -7,7 +7,30 @@ import { defaultCrop, MAX_HEART_PHOTOS, MAX_PHOTO_BYTES, photoGeometry, type Sav
 import type { LibraryAsset } from "./media-picker";
 import styles from "./heart-photo-editor.module.css";
 
-export function HeartPhotoEditor({ library, photos: initialPhotos, revision, ready, uploadsEnabled, onClose, onSaved }: { library: LibraryAsset[]; ready: boolean; uploadsEnabled: boolean; photos: SavedHeartPhoto[]; revision: number; onClose: () => void; onSaved: () => void }) {
+export function HeartPhotoEditor({ photos: initialPhotos, revision, ready, uploadsEnabled, onClose, onSaved }: { ready: boolean; uploadsEnabled: boolean; photos: SavedHeartPhoto[]; revision: number; onClose: () => void; onSaved: () => void }) {
+  const [library, setLibrary] = useState<LibraryAsset[] | null>(null);
+  const [libraryOpen, setLibraryOpen] = useState(false);
+  const [libraryError, setLibraryError] = useState("");
+  const [libraryAttempt, setLibraryAttempt] = useState(0);
+  useEffect(() => {
+    if (!libraryOpen || library !== null) return;
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 20_000);
+    let active = true;
+    async function load() {
+      setLibraryError("");
+      try {
+        const response = await fetch("/api/media/library", { cache: "no-store", signal: controller.signal });
+        if (!response.ok) throw new Error("library-unavailable");
+        const data = await response.json() as { assets: LibraryAsset[] };
+        if (active) setLibrary(data.assets);
+      } catch {
+        if (active) setLibraryError("Couldn’t load Gallery. Please try again.");
+      } finally { window.clearTimeout(timeout); }
+    }
+    void load();
+    return () => { active = false; controller.abort(); window.clearTimeout(timeout); };
+  }, [libraryOpen, library, libraryAttempt]);
   const id = useId(); const fileInput = useRef<HTMLInputElement>(null);
   const mounted = useSyncExternalStore(() => () => undefined, () => true, () => false);
   const [photos] = useState(initialPhotos); const [selected, setSelected] = useState(0);
@@ -76,7 +99,11 @@ export function HeartPhotoEditor({ library, photos: initialPhotos, revision, rea
     <div className={styles.heading}><h2 id={`${id}-title`}>Our heart photos</h2><button type="button" onClick={onClose} disabled={pending} aria-label="Close photo editor">×</button></div>
     <p className={styles.hint}>Choose up to three photos for Home. Removing one here keeps it in Gallery.</p>
     <div className={styles.thumbRow}>{photos.map((photo,index)=><button key={photo.id} type="button" className={index===selected&&!candidate?styles.selectedThumb:styles.thumb} onClick={()=>select(index)} disabled={pending} aria-label={`Edit photo ${index+1}`}><img src={`/api/heart-photo/${photo.id}`} alt="" /></button>)}{photos.length<MAX_HEART_PHOTOS&&<button type="button" className={styles.addThumb} onClick={()=>fileInput.current?.click()} disabled={pending||!ready||!uploadsEnabled}>＋</button>}</div>
-    {photos.length<MAX_HEART_PHOTOS&&<details><summary>Choose from Gallery</summary><div className={styles.library}>{library.filter(asset=>!photos.some(photo=>photo.id===asset.id)).map(asset=><button type="button" key={asset.id} disabled={pending||!ready} onClick={()=>{if(asset.width&&asset.height)void patch([...photos,{id:asset.id,width:asset.width,height:asset.height,format:asset.format as SavedHeartPhoto["format"],crop:defaultCrop}]);}} aria-label="Add gallery photo to main card"><img src={`/api/media/${asset.id}?size=thumbnail`} alt="Gallery photo" loading="lazy" /></button>)}</div></details>}
+    {photos.length<MAX_HEART_PHOTOS&&<details onToggle={event => setLibraryOpen(event.currentTarget.open)}><summary>Choose from Gallery</summary>
+      {library === null && !libraryError && <p role="status">Loading Gallery…</p>}
+      {libraryError && <p role="status">{libraryError} <button type="button" onClick={() => setLibraryAttempt(attempt => attempt + 1)}>Retry Gallery</button></p>}
+      {library?.length === 0 && <p>No saved photos yet. Add a photo below.</p>}
+      <div className={styles.library}>{(library ?? []).filter(asset=>!photos.some(photo=>photo.id===asset.id)).map(asset=><button type="button" key={asset.id} disabled={pending||!ready} onClick={()=>{if(asset.width&&asset.height)void patch([...photos,{id:asset.id,width:asset.width,height:asset.height,format:asset.format as SavedHeartPhoto["format"],crop:defaultCrop}]);}} aria-label="Add gallery photo to main card"><img src={`/api/media/${asset.id}?size=thumbnail`} alt="Gallery photo" loading="lazy" /></button>)}</div></details>}
     {current&&<svg className={styles.preview} viewBox="0 0 240 220" role="img" aria-label="Heart photo preview"><defs><clipPath id={`${id}-heart`}><path d="M120 204C100 187 20 132 14 78C8 22 80 1 120 48C160 1 232 22 226 78C220 132 140 187 120 204Z" /></clipPath></defs><g clipPath={`url(#${id}-heart)`}><rect width="240" height="220" fill="#f6d3df" /><image href={current.src} {...photoGeometry(current.width,current.height,crop)} preserveAspectRatio="none" /></g></svg>}
     {!current&&<p className={styles.empty}>Add up to three photos for your heart slideshow.</p>}
     {photos.length<MAX_HEART_PHOTOS&&<><button className={styles.file} type="button" disabled={pending||!ready||!uploadsEnabled} onClick={()=>fileInput.current?.click()}><span>{candidate?"Choose a different photo":"Add a photo"}</span><small>JPG, PNG or WebP · up to 8 MB</small></button><input ref={fileInput} className={styles.fileInput} type="file" accept="image/jpeg,image/png,image/webp" onChange={e=>{choose(e.target.files?.[0]);e.target.value="";}} /></>}

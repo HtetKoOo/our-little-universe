@@ -40,8 +40,10 @@ function recentMissedMonthsary(togetherSince: string, today: string) {
 export default async function Settings() {
   const couple = await requireCouple();
   const db = getDb();
-  const [partner] = await db.select({ name: user.name, email: user.email }).from(coupleMembers).innerJoin(user, eq(coupleMembers.userId, user.id)).where(and(eq(coupleMembers.coupleId, couple.coupleId), eq(coupleMembers.role, "partner"))).limit(1);
-  const [me] = await db.select({ birthday: user.birthday }).from(user).where(eq(user.id, couple.userId)).limit(1);
+  const [[partner], [me]] = await Promise.all([
+    db.select({ name: user.name, email: user.email }).from(coupleMembers).innerJoin(user, eq(coupleMembers.userId, user.id)).where(and(eq(coupleMembers.coupleId, couple.coupleId), eq(coupleMembers.role, "partner"))).limit(1),
+    db.select({ birthday: user.birthday }).from(user).where(eq(user.id, couple.userId)).limit(1),
+  ]);
   const missedDate = recentMissedMonthsary(couple.togetherSince, calendarDate(new Date(), couple.timezone));
   const deliveries = missedDate
     ? await db.select({ userId: coupleEventEmails.userId }).from(coupleEventEmails).where(and(eq(coupleEventEmails.coupleId, couple.coupleId), eq(coupleEventEmails.eventDate, missedDate), inArray(coupleEventEmails.eventKey, ["monthsary", "monthsary-manual"])))

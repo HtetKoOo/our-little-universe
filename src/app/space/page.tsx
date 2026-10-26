@@ -1,7 +1,6 @@
-import { cache, Suspense } from "react";
+import { Suspense } from "react";
 import { CoupleCardLoading, HomeWidgetsLoading } from "@/components/home-loading";
-import { listMediaAssets } from "@/lib/media";
-import { readHeartPhoto, photoConfigured, preserveHeartPhotos } from "@/lib/heart-photo";
+import { readHeartPhoto, photoConfigured } from "@/lib/heart-photo";
 import { requireCouple } from "@/lib/authorization";
 import { calendarDate } from "@/lib/dates";
 import { defaultCardText } from "@/lib/card-text";
@@ -10,22 +9,14 @@ import { HomeWidgets } from "@/components/home-widgets";
 import { PartnerPresence } from "@/components/partner-presence";
 import { homeMemorySnapshot } from "@/lib/memories";
 import { normalizeHomeWidgets } from "@/lib/home-widgets";
-const readHomeHeart = cache(async (couple: Couple) => {
-  const heart = await readHeartPhoto(couple);
-  await preserveHeartPhotos(couple, heart.photos ?? []);
-  return heart;
-});
-
 type Couple = Awaited<ReturnType<typeof requireCouple>>;
 
 async function HomeCard({ couplePromise }: { couplePromise: Promise<Couple> }) {
   const couple = await couplePromise;
-  const heart = await readHomeHeart(couple);
-  const library = await listMediaAssets(couple);
+  const heart = await readHeartPhoto(couple);
   return (
       <EditableCoupleCard
         key={`${couple.cardRevision}-${heart.revision}`}
-        library={library.map(({id, width, height, format}) => ({id, width, height, format}))}
         photos={heart.photos ?? []}
         photoRevision={heart.revision}
         photoReady={heart.ready}
@@ -42,7 +33,6 @@ async function HomeCard({ couplePromise }: { couplePromise: Promise<Couple> }) {
 
 async function HomeShelf({ couplePromise }: { couplePromise: Promise<Couple> }) {
   const couple = await couplePromise;
-  await readHomeHeart(couple);
   const snapshot = await homeMemorySnapshot();
   return (
       <HomeWidgets
@@ -51,10 +41,10 @@ async function HomeShelf({ couplePromise }: { couplePromise: Promise<Couple> }) 
         config={normalizeHomeWidgets(couple.homeWidgets)}
         latest={snapshot.latest}
         milestone={snapshot.milestone}
-        memoryCount={snapshot.total}
+        memoryCount={snapshot.hasMemory ? 1 : 0}
         favoriteCoverSrc={
           snapshot.favoriteCoverId
-            ? `/api/media/${snapshot.favoriteCoverId}`
+            ? `/api/media/${snapshot.favoriteCoverId}?size=thumbnail`
             : undefined
         }
         galleryPhotoSrcs={snapshot.galleryPhotoIds.map(

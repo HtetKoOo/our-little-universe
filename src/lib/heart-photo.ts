@@ -1,5 +1,5 @@
 import "server-only";
-import { and, eq, lt, sql } from "drizzle-orm";
+import { and, eq, inArray, lt, sql } from "drizzle-orm";
 import { getAuth, authConfigured } from "./auth";
 import { getDb } from "./db";
 import { coupleMembers, couples, heartPhotoUploads, mediaAssets } from "./db/schema";
@@ -28,8 +28,12 @@ export function photoConfigured() {
 // Register legacy heart files in the shared library without copying image bytes.
 // The provider supplies accurate size; a failed import leaves the old photo intact.
 export async function preserveHeartPhotos(actor: { coupleId: string; userId: string }, photos: SavedHeartPhoto[]) {
+  if (!photos.length) return;
+  const registered = await getDb().select({ id: mediaAssets.id }).from(mediaAssets)
+    .where(and(eq(mediaAssets.coupleId, actor.coupleId), inArray(mediaAssets.id, photos.map(photo => photo.id))));
+  const existing = new Set(registered.map(photo => photo.id));
   for (const photo of photos) {
-    if (await findMediaAsset(actor, photo.id)) continue;
+    if (existing.has(photo.id)) continue;
     const resource = await getCloudinary().api.resource(publicIdFor(photo.id), {
       resource_type: "image", type: "authenticated",
     });

@@ -1,6 +1,8 @@
+import { homePhotosQuery } from "./db/home-photos-query";
+import { selectHomePhotoIds } from "./home-photo-selection";
 import "server-only";
 import { normalizeHomeWidgets } from "./home-widgets";
-import { and, count, desc, eq, inArray } from "drizzle-orm";
+import { and, desc, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { requireCouple } from "./authorization";
 import { getDb } from "./db";
@@ -78,20 +80,20 @@ export async function homeMemorySnapshot() {
   const actor = await requireCouple();
   const db = getDb();
   const config = normalizeHomeWidgets(actor.homeWidgets);
-  const selectedId = config.find(widget => widget.id === "memory")?.memoryId;
-  const chosenIds = config.find(widget => widget.id === "photo")?.photoIds ?? [];
-  // These reads share request-scoped authorization, but do not depend on one another.
-  const [[latest], [milestone], [total], [featured], galleryPhotos, chosenPhotos] = await Promise.all([
-    db.select().from(memories).where(memoryScope(actor))
-      .orderBy(desc(memories.happenedOn), desc(memories.id)).limit(1),
-    db.select().from(memories).where(and(memoryScope(actor), eq(memories.isMilestone, true)))
-      .orderBy(desc(memories.happenedOn), desc(memories.id)).limit(1),
-    db.select({ value: count() }).from(memories).where(memoryScope(actor)),
-    selectedId ? db.select().from(memories).where(memoryScope(actor, selectedId)).limit(1) : Promise.resolve([]),
-    db.select({ id: mediaAssets.id }).from(mediaAssets).where(eq(mediaAssets.coupleId, actor.coupleId))
-      .orderBy(desc(mediaAssets.createdAt)).limit(3),
-    chosenIds.length ? db.select({ id: mediaAssets.id }).from(mediaAssets)
-      .where(and(eq(mediaAssets.coupleId, actor.coupleId), eq(mediaAssets.resourceType, "image"), inArray(mediaAssets.id, chosenIds))) : Promise.resolve([]),
+  const memoryWidget = config.find(widget => widget.id === "memory" && widget.visible);
+  const photoWidget = config.find(widget => widget.id === "photo" && widget.visible);
+  const selectedId = memoryWidget?.memoryId;
+  const chosenIds = photoWidget?.photoIds ?? [];
+  const cardFields = { id: memories.id, title: memories.title, body: memories.body, happenedOn: memories.happenedOn, isMilestone: memories.isMilestone };
+  // Hidden widgets do no reads. Rank chosen photos first so selection and
+  // newest-photo fallback share one query, including when a choice was removed.
+  const [[latest], [milestone], [featured], galleryPhotos] = await Promise.all([
+    memoryWidget ? db.select(cardFields).from(memories).where(memoryScope(actor))
+      .orderBy(desc(memories.happenedOn), desc(memories.id)).limit(1) : Promise.resolve([]),
+    memoryWidget ? db.select(cardFields).from(memories).where(and(memoryScope(actor), eq(memories.isMilestone, true)))
+      .orderBy(desc(memories.happenedOn), desc(memories.id)).limit(1) : Promise.resolve([]),
+    selectedId ? db.select(cardFields).from(memories).where(memoryScope(actor, selectedId)).limit(1) : Promise.resolve([]),
+    photoWidget ? homePhotosQuery(db, actor, chosenIds) : Promise.resolve([]),
   ]);
   const favorite = featured ?? milestone ?? latest;
   const [favoriteCover] = favorite
@@ -108,13 +110,12 @@ export async function homeMemorySnapshot() {
         .orderBy(memoryMedia.position)
         .limit(1)
     : [];
-  const orderedChosen = chosenIds.filter(id => chosenPhotos.some(photo => photo.id === id));
   return {
     featured: featured ?? null,
     latest: latest ?? null,
     milestone: milestone ?? null,
-    total: total?.value ?? 0,
+    hasMemory: Boolean(latest),
     favoriteCoverId: favoriteCover?.assetId ?? null,
-    galleryPhotoIds: orderedChosen.length ? orderedChosen : galleryPhotos.map(({ id }) => id),
+    galleryPhotoIds: selectHomePhotoIds(chosenIds, galleryPhotos),
   };
 }

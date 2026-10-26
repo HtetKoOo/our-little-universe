@@ -14,7 +14,7 @@ type Memory = { id: string; title: string; body: string; happenedOn: string; isM
 function GalleryPhoto({ src, className }: { src: string; className: string }) {
   const [state, setState] = useState<"loading" | "ready" | "failed">("loading");
   return <span className={`${className} home-gallery-photo home-gallery-photo-${state}`}>
-    <img src={src} alt="" onLoad={() => setState("ready")} onError={() => setState("failed")} />
+    <img src={src} alt="" loading="lazy" decoding="async" onLoad={() => setState("ready")} onError={() => setState("failed")} />
     {state === "failed" && <span className="home-gallery-photo-fallback" aria-hidden="true">♡</span>}
   </span>;
 }
