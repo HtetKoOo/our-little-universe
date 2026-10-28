@@ -1,0 +1,123 @@
+Our Little Universe — Source-Available Proprietary License
+Version 1.0
+
+Copyright (c) 2026 Htet Ko Oo. All Rights Reserved.
+
+1. Scope and ownership
+
+This license governs the original source code, documentation, and other original
+project materials of Our Little Universe distributed with this license (the
+"Materials"), to the extent owned by Htet Ko Oo (the "Owner"). The Materials are
+made publicly available for review; they are not public domain. This is a custom,
+source-available proprietary license, not an OSI-approved open-source license.
+All rights not expressly granted below are reserved. Third-party materials and
+contributor-owned materials remain subject to their own rights and agreements.
+
+2. Limited permissions
+
+Subject to this license, the Owner grants a non-exclusive, non-transferable,
+non-sublicensable permission to:
+
+(a) view and study the Materials and evaluate the Owner's portfolio, skills,
+    architecture, and implementation, including for recruiting and code review;
+(b) make a local copy and run the project privately only as reasonably necessary
+    for that evaluation, issue reproduction, or preparing a proposed contribution
+    to this project; and
+(c) modify a working copy solely to prepare, test, and submit a pull request to
+    the Owner's repository, and display that proposed patch through the
+    repository's issue and pull-request workflow.
+
+Keep copyright, licensing, and third-party notices in permitted copies. These
+permissions do not authorize operating an independent application, making a
+product from the code, or general personal or business use of a self-hosted copy.
+Do not use production credentials, private user data, or production services for
+local evaluation or contribution testing without separate authorization.
+
+3. Hosted application
+
+People may use the publicly offered application and demo through their intended
+interfaces, subject to any applicable account requirements, access controls,
+service terms, and privacy notices. This permission does not grant access to
+private accounts or data, an uptime commitment, or a license to copy, distribute,
+modify, self-host, or commercialize the underlying application.
+
+4. Restrictions
+
+Except as expressly permitted in section 2, under an applicable separate written
+agreement, or under rights preserved in section 7, you may not:
+
+(a) copy, reproduce, redistribute, publish, mirror, sell, rent, sublicense, or
+    otherwise supply the Materials or substantial portions of them;
+(b) modify, adapt, or create derivative works for independent use, including
+    personal, internal business, commercial, or hosted-service use;
+(c) incorporate the Materials into another product or service, commercialize
+    them, or republish them as another product, whether free or paid; or
+(d) remove ownership notices, claim authorship of the Owner's work, or imply
+    endorsement or official affiliation without permission.
+
+Attribution alone is not permission for restricted use. References identifying
+this project for review or attribution are allowed, but no trademark or branding
+license is granted for another product. The Owner retains control of the official
+repository, project branding, acceptance of changes, official releases, and
+commercial licensing of Owner-owned Materials.
+
+5. Contributions
+
+Issues and proposed pull requests are welcome under CONTRIBUTING.md. Permission
+to submit a patch is not permission to merge, release, or commercialize it.
+Contributors retain copyright in their original contributions unless they sign
+a separate agreement transferring it. Submission alone does not transfer
+ownership or constitute execution of a contributor agreement.
+
+Copyrightable third-party contributions require a separate written contributor
+agreement accepted by both the contributor (and any other necessary rights
+holder) and the Owner before merging or releasing them. That agreement must
+expressly cover the Owner's intended distribution, modification, sublicensing,
+and commercial licensing. Until then, proposed contributions may be reviewed
+and tested for acceptance only. This license does not purport to grant rights
+in a contributor's work beyond what that contributor actually authorized.
+
+6. Additional permissions
+
+Commercial use, redistribution, independent use, alternative licensing, and other
+uses outside section 2 require the Owner's prior written permission. Request it
+through a licensing issue in the source repository, if issues are enabled, or
+through a contact channel the Owner has published on their GitHub profile.
+Identify the intended use, code or assets involved, distribution, and commercial
+scope. No permission is granted by silence, an unanswered request, or a pending
+pull request.
+
+7. Third parties, platform permissions, and earlier grants
+
+Dependencies, bundled third-party materials, and separately licensed contributions
+retain their respective licenses. Preserve their required notices and comply
+with those terms. This license neither replaces nor restricts rights granted
+directly by their copyright holders and does not claim ownership of user content.
+
+Nothing here limits permissions required by the applicable hosting platform's
+terms, including GitHub's public-repository viewing and in-service forking
+permissions, or rights that cannot be limited under applicable law. Such platform
+permissions do not, by themselves, authorize independent product reuse.
+
+Earlier project metadata declared ISC. This license applies to versions supplied
+with it; it does not purport to revoke or retroactively narrow any valid license
+rights already granted in earlier versions. The scope and effect of earlier
+publications must be assessed separately.
+
+8. Termination
+
+The permissions granted by this license terminate if you breach its conditions.
+After termination, stop uses dependent on those permissions and remove copies
+held solely under them, except copies retained under a separate valid right or
+as required by law. Ownership reservations, restrictions, third-party and
+prior-rights safeguards, and disclaimers survive to the extent legally effective.
+
+9. Warranty and liability
+
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE MATERIALS ARE PROVIDED
+"AS IS" AND "AS AVAILABLE", WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND
+NONINFRINGEMENT. TO THE SAME EXTENT, THE OWNER IS NOT LIABLE FOR DAMAGES OR
+LOSSES ARISING FROM THE MATERIALS OR THEIR USE, INCLUDING LOSS OF DATA, PROFITS,
+OR BUSINESS, WHETHER IN CONTRACT, TORT, OR OTHERWISE. NOTHING HERE EXCLUDES
+LIABILITY OR RIGHTS THAT APPLICABLE LAW DOES NOT ALLOW TO BE EXCLUDED.
