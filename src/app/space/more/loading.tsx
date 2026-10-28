@@ -1,5 +1,1 @@
-import { SectionLoading } from "@/components/section-loading";
-
-export default function Loading() {
-  return <SectionLoading />;
-}
+export { MoreContent as default } from "@/components/more-content";

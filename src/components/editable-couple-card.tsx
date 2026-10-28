@@ -1,7 +1,6 @@
 "use client";
 import { useActionState, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import type { LibraryAsset } from "./media-picker";
 import dynamic from "next/dynamic";
 
 const HeartPhotoEditor = dynamic(() => import("./heart-photo-editor").then(module => module.HeartPhotoEditor), {
@@ -15,7 +14,6 @@ import { saveCardText } from "@/app/space/customize/actions";
 import styles from "./inline-card-editor.module.css";
 export function EditableCoupleCard({
   text,
-  library,
   revision,
   photos,
   photoRevision,
@@ -23,7 +21,6 @@ export function EditableCoupleCard({
   uploadsEnabled,
   ...props
 }: {
-  library: LibraryAsset[];
   text: CardText;
   revision: number;
   photos: SavedHeartPhoto[];
@@ -151,7 +148,7 @@ export function EditableCoupleCard({
         }
       />
     </form>
-    {photoEditing && <HeartPhotoEditor library={library} ready={photoReady} uploadsEnabled={uploadsEnabled} photos={photos} revision={photoRevision} onClose={() => setPhotoEditing(false)} onSaved={() => {setPhotoEditing(false); router.refresh();}} />}
+    {photoEditing && <HeartPhotoEditor ready={photoReady} uploadsEnabled={uploadsEnabled} photos={photos} revision={photoRevision} onClose={() => setPhotoEditing(false)} onSaved={() => {setPhotoEditing(false); router.refresh();}} />}
     </>
   );
 }

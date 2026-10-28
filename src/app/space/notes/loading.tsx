@@ -1,5 +1,1 @@
-import { SectionLoading } from "@/components/section-loading";
-
-export default function Loading() {
-  return <SectionLoading />;
-}
+export { NotesContent as default } from "@/components/notes-content";

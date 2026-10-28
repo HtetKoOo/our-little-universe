@@ -6328,3 +6328,24 @@ body:has(.memory-detail) .private-header {
 .memory-viewer-image .viewer-photo > img { opacity: 1; }
 .memory-viewer-image .viewer-photo-loading > img { opacity: 0; }
 .memory-viewer-close, .memory-viewer-arrow { z-index: 1; }
+
+/* Keep each streamed Home section in its final dashboard position. */
+@media (min-width: 1100px) {
+  .space-home > .home-card-loading { grid-area: card; min-width: 0; }
+}
+
+.home-card-loading { min-width: 0; }
+.home-data-placeholder, .home-loading-text { display: inline-block; border-radius: 8px; background: #f1dce5; color: transparent; animation: home-data-pulse 1.4s ease-in-out infinite alternate; }
+.home-data-placeholder { min-width: 4ch; }
+.home-loading-text { width: 100%; }
+.home-slide-placeholder { display: grid; place-items: center; height: 44px; color: #dcb2c3; }
+.home-loading-edit { position: absolute; top: 16px; right: 16px; width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid #edc8d6; border-radius: 50%; color: #a04b70; }
+@keyframes home-data-pulse { to { opacity: .5; } }
+@media (prefers-reduced-motion: reduce) { .home-data-placeholder, .home-loading-text { animation: none; } }
+
+/* Route loading uses the real page containers; only unknown values pulse. */
+.route-data-placeholder { display: inline-block; vertical-align: middle; width: 9ch; max-width: 100%; min-height: 1em; border-radius: 6px; background: #f1dce5; color: transparent; animation: home-data-pulse 1.4s ease-in-out infinite alternate; }
+.route-data-wide { width: 85%; }
+.route-photo-placeholder { background: linear-gradient(135deg, #f3e3eb, #fff0e5); animation: home-data-pulse 1.4s ease-in-out infinite alternate; }
+.loading-form-field { display: contents; }
+@media (prefers-reduced-motion: reduce) { .route-data-placeholder, .route-photo-placeholder { animation: none; } }

@@ -185,3 +185,35 @@ If development fixtures need clearing, use the local-only CLI:
 4. Only for disposable fixtures, rerun with `--apply` and type the exact displayed confirmation phrase in the interactive terminal.
 
 The command refuses production, Vercel and CI execution. It clears one explicit test couple’s memories, media attachment/asset records, upload intents, heart photo references and question rounds/progress in one database transaction; Home photo/memory selections are cleared as well. Accounts, couple details, letters, jar notes and the question bank remain. It does **not** delete Cloudinary files or use Cloudinary credentials, so it cannot purge shared production photo storage. Use a separate test Cloudinary environment for upload fixtures. The CLI is never imported by the web app. No database cleanup is performed as part of installing or deploying this change.
+
+## Copyright & License
+
+Copyright © 2026 **Htet Ko Oo**. **All Rights Reserved**, subject to the limited
+permissions and third-party rights described in [LICENSE](LICENSE).
+
+Our Little Universe is publicly viewable for source review, recruiting, and
+portfolio evaluation under a custom **Source-Available Proprietary License**.
+It is **not an OSI-approved open-source license** and does not grant unrestricted
+reuse. The license permits a local copy and private execution only for evaluation,
+issue reproduction, and preparing contributions to this project; the local setup
+instructions above are subject to those limits. People may use the publicly offered
+hosted app and demo through their intended interfaces, subject to access controls
+and any applicable service terms.
+
+Independent personal or business deployment, unauthorized copying, redistribution,
+sublicensing, commercial reuse, and republishing the code as another product require
+prior written permission. GitHub's applicable public-repository viewing and
+in-service forking permissions remain unaffected. Dependencies and other third-party
+materials remain under their own licenses. Earlier versions declared ISC in package
+metadata; this update does not revoke any valid earlier license grants.
+
+Issues and proposed pull requests are welcome; read [CONTRIBUTING.md](CONTRIBUTING.md)
+for review and contributor-agreement requirements. Contributors retain copyright
+unless a separate agreement transfers it. The owner controls the official project,
+branding, releases, and commercial licensing of owner-owned materials.
+
+To request commercial-use or redistribution permission, open a licensing issue in
+this repository if issues are enabled, or use a contact channel published by the
+owner on their GitHub profile. Describe the intended use, code/assets involved, and
+distribution or commercial scope. Permission must be expressly granted in writing;
+silence is not consent.

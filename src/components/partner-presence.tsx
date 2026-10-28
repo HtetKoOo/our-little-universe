@@ -44,7 +44,7 @@ export function PartnerPresence() {
     };
   }, []);
 
-  if (partner === undefined) return null;
+  if (partner === undefined) return <p className="partner-presence" role="status" aria-label="Loading partner status"><Heart size={15} aria-hidden="true" /><span className="home-data-placeholder" aria-hidden="true">Loading partner status</span></p>;
   if (!partner)
     return (
       <p className="partner-presence">

@@ -5,3 +5,14 @@ node_modules/
 *.tsbuildinfo
 
 .pnpm-store/
+
+# Local credentials, provider state, and OS metadata (never commit real secrets).
+.DS_Store
+.vercel/
+.wrangler/
+.dev.vars
+.dev.vars.*
+*.pem
+*.key
+*.p12
+*.pfx

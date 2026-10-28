@@ -30,6 +30,13 @@ export async function listMediaAssets(actor: MediaActor, favoritesOnly = false) 
     .limit(60);
 }
 
+// The picker needs dimensions and identifiers, not provider/storage metadata.
+export async function listPickerAssets(actor: MediaActor) {
+  return getDb().select({ id: mediaAssets.id, format: mediaAssets.format, width: mediaAssets.width, height: mediaAssets.height })
+    .from(mediaAssets).where(and(eq(mediaAssets.coupleId, actor.coupleId), eq(mediaAssets.resourceType, "image")))
+    .orderBy(desc(mediaAssets.createdAt)).limit(60);
+}
+
 export async function findMediaAsset(actor: MediaActor, id: string) {
   const [asset] = await getDb()
     .select()

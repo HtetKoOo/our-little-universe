@@ -1,5 +1,4 @@
-import { SectionLoading } from "@/components/section-loading";
-
-export default function Loading() {
-  return <SectionLoading />;
-}
+import { LettersIntro } from "@/components/letters-intro";
+import { LoveLetterComposer } from "@/components/love-letter-composer";
+import { DataPlaceholder } from "@/components/route-loading";
+export default function Loading() { return <section className="love-letters" aria-busy="true"><LettersIntro /><div className="letters-layout"><LoveLetterComposer loading /><section className="letter-list"><p className="eyebrow">FROM YOUR PERSON</p><h2>Waiting to be opened.</h2><div className="letter-stack" role="status" aria-label="Loading letters">{[0, 1].map(i => <div className="letter-preview" key={i}><small><DataPlaceholder /></small><strong><DataPlaceholder wide /></strong><span><DataPlaceholder wide /></span><b>Open letter →</b></div>)}</div></section></div><section className="letters-written"><p className="eyebrow">YOUR SENT LETTERS</p><DataPlaceholder wide /></section></section>; }
